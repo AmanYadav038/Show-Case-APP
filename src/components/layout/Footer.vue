@@ -4,11 +4,15 @@
       <div class="footer-top">
         <div class="footer-brand">
           <div class="logo">
-            <span class="logo-box">CM</span>
-            <span class="logo-text">Cine<span class="text-gold">Maze</span></span>
+            <div class="logo-icon-wrap">
+              <svg class="logo-play-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 3.75C4 2.784 5.048 2.181 5.882 2.667L20.132 10.917C20.963 11.399 20.963 12.601 20.132 13.083L5.882 21.333C5.048 21.819 4 21.216 4 20.25V3.75Z" />
+              </svg>
+            </div>
+            <span class="logo-text">Show<span class="text-gradient">Case</span></span>
           </div>
           <p class="brand-desc">
-            Your destination for discovering popular TV shows, ratings, and genre collections. Powered by the open TVMaze API.
+            Your premier destination for exploring popular television series, ratings, and genre collections. Powered by the open TVMaze API.
           </p>
         </div>
 
@@ -16,6 +20,7 @@
           <h4 class="links-title">Features</h4>
           <ul class="links-list">
             <li><router-link to="/">Dashboard</router-link></li>
+            <li><router-link to="/genre/Drama">Browse Genres</router-link></li>
             <li><router-link to="/search">Search TV Shows</router-link></li>
             <li><router-link to="/watchlist">My Watchlist</router-link></li>
           </ul>
@@ -32,7 +37,7 @@
 
       <div class="footer-bottom">
         <p class="copyright">
-          © {{ new Date().getFullYear() }} CineMaze. Built with Vue 3 & Clean Frontend Architecture.
+          © {{ new Date().getFullYear() }} ShowCase. Built with Vue 3 & Clean Frontend Architecture.
         </p>
       </div>
     </div>
@@ -41,7 +46,7 @@
 
 <style scoped>
 .app-footer {
-  background: #090a0d;
+  background: #08090e;
   border-top: 1px solid var(--border-subtle);
   padding: 3.5rem 0 2rem;
   margin-top: 4rem;
@@ -63,23 +68,33 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   font-weight: 800;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   margin-bottom: 0.85rem;
 }
 
-.logo-box {
-  background: var(--accent-gold);
-  color: #000;
-  font-weight: 900;
-  font-size: 0.8rem;
-  padding: 0.18rem 0.4rem;
+.logo-icon-wrap {
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
+  background: var(--accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.text-gold {
-  color: var(--accent-gold);
+.logo-play-icon {
+  width: 14px;
+  height: 14px;
+  color: #fff;
+  margin-left: 2px;
+}
+
+.text-gradient {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .brand-desc {
@@ -110,7 +125,7 @@
 }
 
 .links-list a:hover {
-  color: var(--accent-gold);
+  color: #fff;
 }
 
 .footer-bottom {

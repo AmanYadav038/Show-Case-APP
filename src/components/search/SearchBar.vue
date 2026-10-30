@@ -209,9 +209,9 @@ onUnmounted(() => {
 
 .search-input-box:focus-within,
 .search-input-box.focused {
-  border-color: var(--accent-gold);
-  background: #1e212d;
-  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.15);
+  border-color: var(--accent-purple);
+  background: #181c2e;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
 }
 
 .search-icon {
@@ -223,7 +223,7 @@ onUnmounted(() => {
 }
 
 .search-input-box:focus-within .search-icon {
-  color: var(--accent-gold);
+  color: var(--accent-purple);
 }
 
 .search-input {
@@ -249,7 +249,7 @@ onUnmounted(() => {
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.2);
-  border-top-color: var(--accent-gold);
+  border-top-color: var(--accent-purple);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -284,13 +284,13 @@ onUnmounted(() => {
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  background: #181922;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #111422;
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg), 0 0 25px rgba(99, 102, 241, 0.2);
   overflow: hidden;
   z-index: 1000;
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
 }
 
 .dropdown-status {
@@ -301,7 +301,7 @@ onUnmounted(() => {
 }
 
 .query-highlight {
-  color: var(--accent-gold);
+  color: #a5b4fc;
   font-weight: 600;
 }
 
@@ -327,7 +327,7 @@ onUnmounted(() => {
 
 .result-item:hover,
 .result-item.active {
-  background: rgba(245, 197, 24, 0.1);
+  background: rgba(99, 102, 241, 0.14);
 }
 
 .result-thumb-wrapper {
@@ -374,7 +374,7 @@ onUnmounted(() => {
 
 .result-item:hover .result-title,
 .result-item.active .result-title {
-  color: var(--accent-gold);
+  color: #a5b4fc;
 }
 
 .result-meta {
@@ -403,12 +403,12 @@ onUnmounted(() => {
 
 .result-item:hover .result-arrow,
 .result-item.active .result-arrow {
-  color: var(--accent-gold);
+  color: var(--accent-purple);
   transform: translateX(3px);
 }
 
 .dropdown-footer {
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.35);
   border-top: 1px solid var(--border-subtle);
   padding: 0.5rem 0.75rem;
 }
@@ -427,7 +427,7 @@ onUnmounted(() => {
 
 .see-all-btn:hover {
   background: rgba(255, 255, 255, 0.06);
-  color: var(--accent-gold);
+  color: #fff;
 }
 
 .see-all-btn svg {

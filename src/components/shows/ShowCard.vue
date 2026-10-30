@@ -72,17 +72,20 @@ function handleWatchlistClick(e) {
   >
     <!-- Poster Container -->
     <div class="poster-wrapper">
-      <!-- Rank Badge (optional for Top 10 lists) -->
-      <span v-if="showRank !== null" class="rank-badge">
-        #{{ showRank }}
-      </span>
+      <!-- Rank Badge (shown on Top-Left when showRank is present) -->
+      <div v-if="showRank !== null" class="rank-badge">
+        <span class="rank-hash">#</span>{{ showRank }}
+      </div>
 
-      <!-- Rating Badge overlay -->
-      <div class="rating-overlay">
+      <!-- Rating Badge overlay: placed at bottom-left if rank is present, else top-left -->
+      <div 
+        class="rating-overlay"
+        :class="{ 'rating-bottom': showRank !== null, 'rating-top': showRank === null }"
+      >
         <RatingBadge :rating="show.rating" size="sm" />
       </div>
 
-      <!-- Quick Watchlist Button -->
+      <!-- Quick Watchlist Button (Top-Right) -->
       <button 
         class="quick-watchlist-btn"
         :class="{ active: isBookmarked }"
@@ -114,7 +117,7 @@ function handleWatchlistClick(e) {
         <span class="fallback-text">{{ show.name }}</span>
       </div>
 
-      <!-- Subtle gradient shadow -->
+      <!-- Gradient overlay for contrast -->
       <div class="poster-shadow-overlay"></div>
     </div>
 
@@ -147,14 +150,14 @@ function handleWatchlistClick(e) {
 }
 
 .show-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-light);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-5px);
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-md), 0 0 15px rgba(99, 102, 241, 0.2);
 }
 
 .show-card:focus-visible {
-  border-color: var(--accent-gold);
-  box-shadow: 0 0 0 2px var(--accent-gold);
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.4);
 }
 
 .poster-wrapper {
@@ -173,13 +176,13 @@ function handleWatchlistClick(e) {
 }
 
 .show-card:hover .poster-img {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
 .poster-shadow-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(13, 14, 18, 0.7) 0%, transparent 40%);
+  background: linear-gradient(to top, rgba(8, 9, 14, 0.85) 0%, rgba(8, 9, 14, 0.2) 35%, transparent 60%);
   pointer-events: none;
 }
 
@@ -192,7 +195,7 @@ function handleWatchlistClick(e) {
   justify-content: center;
   gap: 0.75rem;
   padding: 1rem;
-  background: linear-gradient(135deg, #1c1e28, #13141c);
+  background: linear-gradient(135deg, #161a2e, #0e111d);
   color: var(--text-muted);
   text-align: center;
 }
@@ -200,7 +203,8 @@ function handleWatchlistClick(e) {
 .fallback-icon {
   width: 38px;
   height: 38px;
-  opacity: 0.6;
+  color: var(--accent-purple);
+  opacity: 0.7;
 }
 
 .fallback-text {
@@ -210,37 +214,60 @@ function handleWatchlistClick(e) {
   line-height: 1.25;
 }
 
-.rating-overlay {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 2;
-}
-
+/* Rank Badge - Vibrant modern gradient badge at top left */
 .rank-badge {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 9px;
+  left: 9px;
   z-index: 3;
-  background: var(--accent-gold);
-  color: #000;
+  background: var(--accent-gradient);
+  color: #fff;
   font-weight: 800;
-  font-size: 0.75rem;
-  padding: 0.2rem 0.5rem;
+  font-size: 0.78rem;
+  padding: 0.25rem 0.55rem;
   border-radius: var(--radius-sm);
   line-height: 1;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 1px;
 }
 
+.rank-hash {
+  font-size: 0.68rem;
+  opacity: 0.85;
+}
+
+/* Rating Overlay - Top-left when unranked, Bottom-left when ranked */
+.rating-overlay {
+  position: absolute;
+  z-index: 2;
+  transition: transform var(--transition-fast);
+}
+
+.rating-overlay.rating-top {
+  top: 9px;
+  left: 9px;
+}
+
+.rating-overlay.rating-bottom {
+  bottom: 9px;
+  left: 9px;
+}
+
+/* Quick Watchlist Button */
 .quick-watchlist-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 2;
+  top: 9px;
+  right: 9px;
+  z-index: 3;
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(6px);
+  background: rgba(8, 9, 14, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: rgba(255, 255, 255, 0.75);
   display: flex;
   align-items: center;
@@ -251,21 +278,24 @@ function handleWatchlistClick(e) {
 }
 
 .quick-watchlist-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
 }
 
 .quick-watchlist-btn:hover {
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(8, 9, 14, 0.95);
   color: #fff;
+  border-color: var(--accent-purple);
   transform: scale(1);
 }
 
 .quick-watchlist-btn.active {
   opacity: 1;
   transform: scale(1);
-  color: var(--accent-gold);
-  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  background: var(--accent-gradient);
+  border-color: transparent;
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
 }
 
 .show-card:hover .quick-watchlist-btn {
@@ -294,14 +324,16 @@ function handleWatchlistClick(e) {
 
 .meta-genre {
   font-size: 0.7rem;
-  padding: 0.1rem 0.4rem;
-  background: rgba(255, 255, 255, 0.05);
+  font-weight: 600;
+  padding: 0.12rem 0.45rem;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.2);
   border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  color: #c7d2fe;
 }
 
 .show-title {
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   font-weight: 700;
   line-height: 1.3;
   color: var(--text-primary);
@@ -313,6 +345,6 @@ function handleWatchlistClick(e) {
 }
 
 .show-card:hover .show-title {
-  color: var(--accent-gold);
+  color: #a5b4fc;
 }
 </style>

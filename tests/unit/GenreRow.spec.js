@@ -24,7 +24,7 @@ describe('GenreRow.vue', () => {
     }
   ]
 
-  it('renders section title and show count correctly', () => {
+  it('renders section title, show count and View All button correctly', () => {
     const wrapper = mount(GenreRow, {
       props: {
         title: 'Drama Shows',
@@ -33,6 +33,9 @@ describe('GenreRow.vue', () => {
       },
       global: {
         stubs: {
+          'router-link': {
+            template: '<a class="router-link-stub"><slot /></a>'
+          },
           ShowCard: {
             props: ['show', 'showRank'],
             template: '<div class="stub-card">{{ show.name }}</div>'
@@ -43,6 +46,7 @@ describe('GenreRow.vue', () => {
 
     expect(wrapper.text()).toContain('Drama Shows')
     expect(wrapper.text()).toContain('2 shows')
+    expect(wrapper.text()).toContain('View All')
     expect(wrapper.findAll('.stub-card').length).toBe(2)
   })
 
@@ -51,6 +55,11 @@ describe('GenreRow.vue', () => {
       props: {
         title: 'Empty Genre',
         shows: []
+      },
+      global: {
+        stubs: {
+          'router-link': true
+        }
       }
     })
 

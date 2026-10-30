@@ -1,13 +1,13 @@
 import { ref, watch } from 'vue'
 
-const STORAGE_KEY = 'cinemaze_watchlist'
+const STORAGE_KEY = 'showcase_watchlist'
 
 // Shared reactive state across components
 const watchlist = ref(loadWatchlist())
 
 function loadWatchlist() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('cinemaze_watchlist')
     return raw ? JSON.parse(raw) : []
   } catch (e) {
     console.warn('Failed to read watchlist from localStorage', e)

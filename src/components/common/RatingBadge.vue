@@ -41,9 +41,9 @@ const hasRating = computed(() => formatted.value !== '—')
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 12, 20, 0.82);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);
   color: #fff;
   font-weight: 700;
@@ -52,8 +52,9 @@ const hasRating = computed(() => formatted.value !== '—')
 }
 
 .star-icon {
-  color: var(--accent-gold);
+  color: var(--rating-gold);
   flex-shrink: 0;
+  filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.4));
 }
 
 .rating-value {
@@ -67,16 +68,17 @@ const hasRating = computed(() => formatted.value !== '—')
 }
 
 .badge-empty {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .badge-empty .star-icon {
   color: var(--text-muted);
+  filter: none;
 }
 
 /* Sizes */
 .badge-sm {
-  padding: 0.2rem 0.45rem;
+  padding: 0.22rem 0.5rem;
   font-size: 0.75rem;
 }
 .badge-sm .star-icon {
@@ -85,7 +87,7 @@ const hasRating = computed(() => formatted.value !== '—')
 }
 
 .badge-md {
-  padding: 0.3rem 0.6rem;
+  padding: 0.32rem 0.65rem;
   font-size: 0.85rem;
 }
 .badge-md .star-icon {

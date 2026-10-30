@@ -264,14 +264,14 @@ watch(() => route.query.q, (newQ) => {
 }
 
 .main-search-input:focus {
-  border-color: var(--accent-gold);
-  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.15);
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
 }
 
 .search-submit-btn {
   padding: 0.85rem 1.6rem;
-  background: var(--accent-gold);
-  color: #000;
+  background: var(--accent-gradient);
+  color: #fff;
   font-weight: 800;
   font-size: 0.95rem;
   border-radius: var(--radius-md);
@@ -280,7 +280,7 @@ watch(() => route.query.q, (newQ) => {
 }
 
 .search-submit-btn:hover {
-  background: var(--accent-gold-hover);
+  background: var(--accent-gradient-hover);
   transform: translateY(-1px);
 }
 
@@ -338,9 +338,9 @@ watch(() => route.query.q, (newQ) => {
 }
 
 .filter-chip.active {
-  background: var(--accent-gold);
-  color: #000;
-  border-color: var(--accent-gold);
+  background: var(--accent-gradient);
+  color: #fff;
+  border-color: transparent;
 }
 
 .toolbar-right {
@@ -376,7 +376,7 @@ watch(() => route.query.q, (newQ) => {
 }
 
 .sort-select:focus {
-  border-color: var(--accent-gold);
+  border-color: var(--accent-purple);
 }
 
 .no-results-box {
@@ -428,8 +428,8 @@ watch(() => route.query.q, (newQ) => {
 
 .reset-filter-btn {
   padding: 0.6rem 1.25rem;
-  background: var(--accent-gold);
-  color: #000;
+  background: var(--accent-gradient);
+  color: #fff;
   font-weight: 700;
   font-size: 0.88rem;
   border-radius: var(--radius-md);

@@ -247,11 +247,11 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(245, 197, 24, 0.15);
-  border: 1px solid rgba(245, 197, 24, 0.3);
-  color: var(--accent-gold);
+  background: var(--accent-gradient-subtle);
+  border: 1px solid var(--border-accent);
+  color: #c7d2fe;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   padding: 0.25rem 0.75rem;
@@ -262,9 +262,9 @@ onUnmounted(() => {
 .spotlight-pulse {
   width: 7px;
   height: 7px;
-  background: var(--accent-gold);
+  background: var(--accent-pink);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--accent-gold);
+  box-shadow: 0 0 8px var(--accent-pink);
 }
 
 .hero-title {
@@ -318,10 +318,10 @@ onUnmounted(() => {
   font-size: 0.8rem;
   font-weight: 600;
   padding: 0.25rem 0.7rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.25);
   border-radius: var(--radius-full);
-  color: #e5e7eb;
+  color: #c7d2fe;
 }
 
 .hero-synopsis {
@@ -348,26 +348,27 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--accent-gold);
-  color: #000;
+  background: var(--accent-gradient);
+  color: #fff;
   font-size: 0.95rem;
   font-weight: 800;
   padding: 0.75rem 1.45rem;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-gold);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
   transition: all var(--transition-fast);
 }
 
 .hero-btn-primary:hover {
-  background: var(--accent-gold-hover);
+  background: var(--accent-gradient-hover);
   transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
 }
 
 .hero-btn-secondary {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.18);
   color: #fff;
@@ -379,14 +380,14 @@ onUnmounted(() => {
 }
 
 .hero-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.16);
   transform: translateY(-2px);
 }
 
 .hero-btn-secondary.active {
-  background: var(--accent-gold-dim);
+  background: var(--accent-dim);
   border-color: var(--border-accent);
-  color: var(--accent-gold);
+  color: #c7d2fe;
 }
 
 .btn-icon {
@@ -411,6 +412,6 @@ onUnmounted(() => {
 
 .indicator-dot.active {
   width: 24px;
-  background: var(--accent-gold);
+  background: var(--accent-gradient);
 }
 </style>

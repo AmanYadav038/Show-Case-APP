@@ -181,17 +181,17 @@ function handleWatchlistToggle() {
 .hover-popover-card {
   position: fixed;
   z-index: 9999;
-  background: #191b24;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #111422;
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(245, 197, 24, 0.2);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 25px rgba(99, 102, 241, 0.25);
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   pointer-events: auto;
   color: var(--text-primary);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
 }
 
 .popover-header {
@@ -320,18 +320,20 @@ function handleWatchlistToggle() {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  background: var(--accent-gold);
-  color: #000;
+  background: var(--accent-gradient);
+  color: #fff;
   font-size: 0.85rem;
   font-weight: 700;
   padding: 0.55rem 0.85rem;
   border-radius: var(--radius-sm);
-  transition: background var(--transition-fast), transform var(--transition-fast);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  transition: all var(--transition-fast);
 }
 
 .action-btn-primary:hover {
-  background: var(--accent-gold-hover);
+  background: var(--accent-gradient-hover);
   transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
 }
 
 .btn-arrow {
@@ -362,8 +364,8 @@ function handleWatchlistToggle() {
 }
 
 .action-btn-icon.active {
-  background: var(--accent-gold-dim);
-  color: var(--accent-gold);
+  background: var(--accent-gradient);
+  color: #fff;
 }
 
 /* Transitions */

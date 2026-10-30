@@ -69,8 +69,8 @@ const { watchlist } = useWatchlist()
 .count-pill {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--accent-gold);
-  background: var(--accent-gold-dim);
+  color: #c7d2fe;
+  background: var(--accent-gradient-subtle);
   border: 1px solid var(--border-accent);
   padding: 0.2rem 0.6rem;
   border-radius: var(--radius-full);
@@ -118,16 +118,17 @@ const { watchlist } = useWatchlist()
   display: inline-flex;
   align-items: center;
   padding: 0.75rem 1.5rem;
-  background: var(--accent-gold);
-  color: #000;
+  background: var(--accent-gradient);
+  color: #fff;
   font-weight: 800;
   font-size: 0.92rem;
   border-radius: var(--radius-md);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
   transition: all var(--transition-fast);
 }
 
 .browse-btn:hover {
-  background: var(--accent-gold-hover);
+  background: var(--accent-gradient-hover);
   transform: translateY(-2px);
 }
 </style>

@@ -3,32 +3,40 @@ import DashboardView from '../views/DashboardView.vue'
 import ShowDetailView from '../views/ShowDetailView.vue'
 import SearchView from '../views/SearchView.vue'
 import WatchlistView from '../views/WatchlistView.vue'
+import GenreView from '../views/GenreView.vue'
 
 const routes = [
   {
     path: '/',
     name: 'dashboard',
     component: DashboardView,
-    meta: { title: 'CineMaze — Discover Popular TV Shows' }
+    meta: { title: 'ShowCase — Discover Popular TV Shows & Genres' }
   },
   {
     path: '/show/:id',
     name: 'show-detail',
     component: ShowDetailView,
     props: true,
-    meta: { title: 'TV Show Details' }
+    meta: { title: 'Show Details — ShowCase' }
+  },
+  {
+    path: '/genre/:genre',
+    name: 'genre-detail',
+    component: GenreView,
+    props: true,
+    meta: { title: 'Genre Collection — ShowCase' }
   },
   {
     path: '/search',
     name: 'search',
     component: SearchView,
-    meta: { title: 'Search TV Shows' }
+    meta: { title: 'Search TV Shows — ShowCase' }
   },
   {
     path: '/watchlist',
     name: 'watchlist',
     component: WatchlistView,
-    meta: { title: 'My Watchlist' }
+    meta: { title: 'My Watchlist — ShowCase' }
   },
   {
     path: '/:pathMatch(.*)*',

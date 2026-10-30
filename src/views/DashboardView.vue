@@ -1,10 +1,13 @@
 <script setup>
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useShows } from '../composables/useShows.js'
 import HeroBanner from '../components/shows/HeroBanner.vue'
 import GenreRow from '../components/shows/GenreRow.vue'
 import LoadingSkeleton from '../components/common/LoadingSkeleton.vue'
 import ErrorState from '../components/common/ErrorState.vue'
+
+const router = useRouter()
 
 const {
   loading,
@@ -21,11 +24,8 @@ onMounted(() => {
   loadShows()
 })
 
-function scrollToGenre(genreName) {
-  const el = document.getElementById(`genre-${genreName.toLowerCase()}`)
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+function goToGenre(genreName) {
+  router.push({ name: 'genre-detail', params: { genre: genreName } })
 }
 </script>
 
@@ -51,13 +51,13 @@ function scrollToGenre(genreName) {
       <!-- Hero Spotlight Banner -->
       <HeroBanner :shows="featuredShows" />
 
-      <!-- Quick Genre Jump Pills -->
+      <!-- Quick Genre Selector Bar -->
       <div class="genre-nav-bar">
-        <span class="genre-nav-label">Jump to:</span>
+        <span class="genre-nav-label">Explore Genres:</span>
         <div class="genre-pill-scroll">
           <button
-            class="genre-jump-btn"
-            @click="scrollToGenre('top-rated')"
+            class="genre-jump-btn featured-pill"
+            @click="goToGenre('Top-Rated')"
           >
             ⭐ Top Rated
           </button>
@@ -65,7 +65,7 @@ function scrollToGenre(genreName) {
             v-for="genre in availableGenres"
             :key="genre.name"
             class="genre-jump-btn"
-            @click="scrollToGenre(genre.name)"
+            @click="goToGenre(genre.name)"
           >
             {{ genre.name }}
           </button>
@@ -77,12 +77,12 @@ function scrollToGenre(genreName) {
         <GenreRow
           title="Top Rated TV Shows"
           :shows="topRatedShows"
-          genre-key="top-rated"
+          genre-key="Top-Rated"
           :is-ranked="true"
         />
       </div>
 
-      <!-- Genre-based Horizontal Rows -->
+      <!-- Genre-based Horizontal Rows with "View All" -->
       <GenreRow
         v-for="(shows, genreName) in genreLists"
         :key="genreName"
@@ -103,21 +103,22 @@ function scrollToGenre(genreName) {
 .genre-nav-bar {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  margin-bottom: 2.25rem;
-  padding: 0.75rem 1rem;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  padding: 0.85rem 1.25rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .genre-nav-label {
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   color: var(--text-muted);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   white-space: nowrap;
 }
 
@@ -135,18 +136,31 @@ function scrollToGenre(genreName) {
 }
 
 .genre-jump-btn {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 600;
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.06);
-  padding: 0.35rem 0.85rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  padding: 0.35rem 0.95rem;
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
 }
 
 .genre-jump-btn:hover {
-  background: var(--accent-gold);
-  color: #000;
+  background: rgba(99, 102, 241, 0.18);
+  border-color: var(--accent-purple);
+  color: #fff;
   transform: translateY(-1px);
+}
+
+.genre-jump-btn.featured-pill {
+  background: var(--accent-gradient-subtle);
+  border-color: var(--border-accent);
+  color: #c7d2fe;
+}
+
+.genre-jump-btn.featured-pill:hover {
+  background: var(--accent-gradient);
+  color: #fff;
 }
 </style>

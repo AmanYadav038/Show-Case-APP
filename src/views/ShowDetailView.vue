@@ -101,7 +101,7 @@ async function fetchDetails() {
   try {
     const data = await fetchShowDetails(props.id)
     show.value = data
-    document.title = `${data.name} — CineMaze`
+    document.title = `${data.name} — ShowCase`
   } catch (err) {
     error.value = err.message || 'Unable to load show details.'
   } finally {
@@ -379,8 +379,8 @@ watch(() => props.id, () => {
 }
 
 .back-nav-btn:hover {
-  color: var(--accent-gold);
-  border-color: var(--accent-gold);
+  color: #fff;
+  border-color: var(--accent-purple);
   transform: translateX(-3px);
 }
 
@@ -465,14 +465,14 @@ watch(() => props.id, () => {
 }
 
 .poster-watchlist-btn:hover {
-  background: #000;
-  border-color: var(--accent-gold);
+  background: rgba(22, 25, 40, 0.95);
+  border-color: var(--accent-purple);
 }
 
 .poster-watchlist-btn.active {
-  background: var(--accent-gold);
-  color: #000;
-  border-color: var(--accent-gold);
+  background: var(--accent-gradient);
+  color: #fff;
+  border-color: transparent;
 }
 
 .poster-watchlist-btn svg {
@@ -634,12 +634,12 @@ watch(() => props.id, () => {
 }
 
 .external-site-btn {
-  background: var(--accent-gold);
-  color: #000;
+  background: var(--accent-gradient);
+  color: #fff;
 }
 
 .external-site-btn:hover {
-  background: var(--accent-gold-hover);
+  background: var(--accent-gradient-hover);
   transform: translateY(-1px);
 }
 
@@ -672,7 +672,7 @@ watch(() => props.id, () => {
 }
 
 .back-link-btn {
-  color: var(--accent-gold);
+  color: var(--accent-purple);
   font-weight: 700;
   margin-top: 1rem;
 }
