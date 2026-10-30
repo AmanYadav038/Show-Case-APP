@@ -9,7 +9,7 @@ export const CURATED_GENRES = [
   'Comedy',
   'Thriller',
   'Crime',
-  'Animation',
+  'Anime',
   'Adventure',
   'Mystery',
   'Romance',
