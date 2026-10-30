@@ -176,7 +176,7 @@ onUnmounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(8, 9, 14, 0.92);
+  background: rgba(21, 19, 19, 0.94);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
   width: 100%;
@@ -215,7 +215,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 15px rgba(230, 57, 70, 0.45);
 }
 
 .logo-play-icon {
@@ -294,11 +294,11 @@ onUnmounted(() => {
   top: calc(100% + 12px);
   left: 0;
   width: 360px;
-  background: #121524;
+  background: var(--bg-surface);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   padding: 1.15rem;
-  box-shadow: var(--shadow-lg), 0 0 25px rgba(99, 102, 241, 0.2);
+  box-shadow: var(--shadow-lg), 0 0 25px rgba(230, 57, 70, 0.2);
   z-index: 200;
   backdrop-filter: blur(20px);
 }
@@ -334,8 +334,8 @@ onUnmounted(() => {
 }
 
 .genre-item-btn:hover {
-  background: rgba(99, 102, 241, 0.15);
-  color: #fff;
+  background: rgba(230, 57, 70, 0.16);
+  color: var(--text-primary);
   transform: translateX(2px);
 }
 
@@ -361,7 +361,7 @@ onUnmounted(() => {
   font-weight: 800;
   padding: 0.12rem 0.5rem;
   border-radius: var(--radius-full);
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
 }
 
 .header-search {

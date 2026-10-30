@@ -379,8 +379,8 @@ watch(() => props.id, () => {
 }
 
 .back-nav-btn:hover {
-  color: #fff;
-  border-color: var(--accent-purple);
+  color: var(--accent);
+  border-color: var(--border-accent);
   transform: translateX(-3px);
 }
 
@@ -441,7 +441,7 @@ watch(() => props.id, () => {
   align-items: center;
   justify-content: center;
   font-size: 3rem;
-  background: #202330;
+  background: #362a2a;
 }
 
 .poster-watchlist-btn {
@@ -453,20 +453,20 @@ watch(() => props.id, () => {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: rgba(13, 14, 18, 0.85);
+  background: rgba(21, 19, 19, 0.88);
   backdrop-filter: blur(10px);
-  color: #fff;
+  color: var(--text-primary);
   font-weight: 700;
   font-size: 0.85rem;
   padding: 0.65rem 1rem;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 248, 240, 0.15);
   transition: all var(--transition-fast);
 }
 
 .poster-watchlist-btn:hover {
-  background: rgba(22, 25, 40, 0.95);
-  border-color: var(--accent-purple);
+  background: rgba(41, 32, 32, 0.95);
+  border-color: var(--accent);
 }
 
 .poster-watchlist-btn.active {
@@ -560,10 +560,10 @@ watch(() => props.id, () => {
   font-size: 0.82rem;
   font-weight: 600;
   padding: 0.3rem 0.8rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-subtle);
+  background: rgba(230, 57, 70, 0.15);
+  border: 1px solid rgba(230, 57, 70, 0.28);
   border-radius: var(--radius-full);
-  color: var(--text-secondary);
+  color: var(--accent);
 }
 
 .detail-synopsis-box {
@@ -672,7 +672,7 @@ watch(() => props.id, () => {
 }
 
 .back-link-btn {
-  color: var(--accent-purple);
+  color: var(--accent);
   font-weight: 700;
   margin-top: 1rem;
 }

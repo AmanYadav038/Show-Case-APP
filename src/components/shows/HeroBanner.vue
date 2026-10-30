@@ -249,7 +249,7 @@ onUnmounted(() => {
   gap: 0.5rem;
   background: var(--accent-gradient-subtle);
   border: 1px solid var(--border-accent);
-  color: #c7d2fe;
+  color: var(--accent);
   font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -262,9 +262,9 @@ onUnmounted(() => {
 .spotlight-pulse {
   width: 7px;
   height: 7px;
-  background: var(--accent-pink);
+  background: var(--primary);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--accent-pink);
+  box-shadow: 0 0 8px var(--primary);
 }
 
 .hero-title {
@@ -301,7 +301,7 @@ onUnmounted(() => {
 
 .meta-status {
   padding: 0.15rem 0.5rem;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 248, 240, 0.08);
   border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
@@ -318,10 +318,10 @@ onUnmounted(() => {
   font-size: 0.8rem;
   font-weight: 600;
   padding: 0.25rem 0.7rem;
-  background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  background: rgba(230, 57, 70, 0.14);
+  border: 1px solid rgba(230, 57, 70, 0.28);
   border-radius: var(--radius-full);
-  color: #c7d2fe;
+  color: var(--accent);
 }
 
 .hero-synopsis {
@@ -354,24 +354,24 @@ onUnmounted(() => {
   font-weight: 800;
   padding: 0.75rem 1.45rem;
   border-radius: var(--radius-md);
-  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 20px rgba(230, 57, 70, 0.4);
   transition: all var(--transition-fast);
 }
 
 .hero-btn-primary:hover {
   background: var(--accent-gradient-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 6px 24px rgba(230, 57, 70, 0.55);
 }
 
 .hero-btn-secondary {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 248, 240, 0.08);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #fff;
+  border: 1px solid rgba(255, 248, 240, 0.18);
+  color: var(--text-primary);
   font-size: 0.95rem;
   font-weight: 600;
   padding: 0.75rem 1.35rem;
@@ -380,14 +380,14 @@ onUnmounted(() => {
 }
 
 .hero-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 248, 240, 0.16);
   transform: translateY(-2px);
 }
 
 .hero-btn-secondary.active {
-  background: var(--accent-dim);
+  background: var(--primary-dim);
   border-color: var(--border-accent);
-  color: #c7d2fe;
+  color: var(--accent);
 }
 
 .btn-icon {

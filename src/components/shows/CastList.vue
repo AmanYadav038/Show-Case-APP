@@ -66,8 +66,9 @@ const displayedCast = computed(() => props.cast.slice(0, 16))
 .accent-bar {
   width: 4px;
   height: 20px;
-  background: var(--accent-gold);
+  background: var(--accent-gradient);
   border-radius: var(--radius-full);
+  box-shadow: 0 0 10px rgba(230, 57, 70, 0.45);
 }
 
 .section-title {

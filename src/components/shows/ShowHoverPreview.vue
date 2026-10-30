@@ -181,10 +181,10 @@ function handleWatchlistToggle() {
 .hover-popover-card {
   position: fixed;
   z-index: 9999;
-  background: #111422;
+  background: var(--bg-surface);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 25px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 25px rgba(230, 57, 70, 0.25);
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -289,18 +289,18 @@ function handleWatchlistToggle() {
 
 .genre-pill {
   font-size: 0.7rem;
-  font-weight: 500;
+  font-weight: 600;
   padding: 0.18rem 0.5rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(230, 57, 70, 0.14);
+  border: 1px solid rgba(230, 57, 70, 0.28);
   border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  color: var(--accent);
 }
 
 .popover-synopsis {
   font-size: 0.82rem;
   line-height: 1.45;
-  color: #b0b7c7;
+  color: var(--text-secondary);
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -326,14 +326,14 @@ function handleWatchlistToggle() {
   font-weight: 700;
   padding: 0.55rem 0.85rem;
   border-radius: var(--radius-sm);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.35);
   transition: all var(--transition-fast);
 }
 
 .action-btn-primary:hover {
   background: var(--accent-gradient-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 6px 16px rgba(230, 57, 70, 0.5);
 }
 
 .btn-arrow {

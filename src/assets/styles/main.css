@@ -1,37 +1,40 @@
 :root {
-  /* Rich Modern Cinema Palette - Deep Space & Electric Violet / Indigo */
-  --bg-primary: #08090e;
-  --bg-surface: #0f121d;
-  --bg-surface-elevated: #161928;
-  --bg-card: #121524;
-  --bg-card-hover: #1b2035;
+  /* User-Defined Elegant Crimson & Rose Cinema Palette */
+  --bg-primary: #151313;
+  --bg-surface: #292020;
+  --bg-surface-elevated: #362a2a;
+  --bg-card: #201a1a;
+  --bg-card-hover: #322626;
   
-  --accent-primary: #6366f1;
-  --accent-primary-hover: #4f46e5;
-  --accent-purple: #8b5cf6;
-  --accent-pink: #ec4899;
-  --accent-cyan: #06b6d4;
+  --primary: #E63946;
+  --primary-hover: #d32f3d;
+  --primary-dim: rgba(230, 57, 70, 0.16);
   
-  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
-  --accent-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c026d3 100%);
-  --accent-gradient-subtle: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(217, 70, 239, 0.15) 100%);
-  --accent-dim: rgba(99, 102, 241, 0.18);
+  --accent: #F4A6A6;
+  --accent-hover: #f8bebe;
+  --accent-dim: rgba(244, 166, 166, 0.16);
+
+  /* Gradients for badges, active states, and buttons */
+  --accent-gradient: linear-gradient(135deg, #E63946 0%, #ee5965 50%, #F4A6A6 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #d32f3d 0%, #e64553 50%, #f19595 100%);
+  --accent-gradient-subtle: linear-gradient(135deg, rgba(230, 57, 70, 0.22) 0%, rgba(244, 166, 166, 0.18) 100%);
 
   --rating-gold: #fbbf24;
   
-  --text-primary: #ffffff;
-  --text-secondary: #9da6be;
-  --text-muted: #646e89;
+  --text-primary: #FFF8F0;
+  --text-secondary: #d8ccc4;
+  --text-muted: #9b8b84;
   
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-light: rgba(255, 255, 255, 0.16);
-  --border-accent: rgba(139, 92, 246, 0.45);
+  --border-subtle: rgba(255, 248, 240, 0.08);
+  --border-light: rgba(255, 248, 240, 0.16);
+  --border-accent: rgba(230, 57, 70, 0.45);
+  --border-rose: rgba(244, 166, 166, 0.35);
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.7);
-  --shadow-accent: 0 4px 25px rgba(99, 102, 241, 0.35);
-  --shadow-pink: 0 4px 20px rgba(236, 72, 153, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.75);
+  --shadow-accent: 0 4px 20px rgba(230, 57, 70, 0.35);
+  --shadow-rose: 0 4px 18px rgba(244, 166, 166, 0.25);
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -53,8 +56,8 @@ html, body {
   min-height: 100%;
   background-color: var(--bg-primary);
   background-image: 
-    radial-gradient(at 15% 15%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-    radial-gradient(at 85% 85%, rgba(217, 70, 239, 0.05) 0px, transparent 50%);
+    radial-gradient(at 15% 15%, rgba(230, 57, 70, 0.07) 0px, transparent 50%),
+    radial-gradient(at 85% 85%, rgba(244, 166, 166, 0.05) 0px, transparent 50%);
   background-attachment: fixed;
   color: var(--text-primary);
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -98,12 +101,12 @@ img {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #252a42;
+  background: #3e2e2e;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #373e61;
+  background: #543f3f;
 }
 
 /* Global Container */
@@ -134,13 +137,13 @@ img {
 
 @keyframes pulseSkeleton {
   0% {
-    background-color: rgba(255, 255, 255, 0.04);
+    background-color: rgba(255, 248, 240, 0.04);
   }
   50% {
-    background-color: rgba(255, 255, 255, 0.09);
+    background-color: rgba(255, 248, 240, 0.09);
   }
   100% {
-    background-color: rgba(255, 255, 255, 0.04);
+    background-color: rgba(255, 248, 240, 0.04);
   }
 }
 

@@ -147,16 +147,16 @@ function goToGenre(genreName) {
 }
 
 .genre-jump-btn:hover {
-  background: rgba(99, 102, 241, 0.18);
-  border-color: var(--accent-purple);
-  color: #fff;
+  background: rgba(230, 57, 70, 0.16);
+  border-color: var(--border-accent);
+  color: var(--text-primary);
   transform: translateY(-1px);
 }
 
 .genre-jump-btn.featured-pill {
   background: var(--accent-gradient-subtle);
   border-color: var(--border-accent);
-  color: #c7d2fe;
+  color: var(--accent);
 }
 
 .genre-jump-btn.featured-pill:hover {

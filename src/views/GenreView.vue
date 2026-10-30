@@ -226,8 +226,8 @@ watch(() => props.genre, (newVal) => {
 }
 
 .back-link:hover {
-  color: #fff;
-  border-color: var(--accent-purple);
+  color: var(--accent);
+  border-color: var(--border-accent);
   transform: translateX(-3px);
 }
 
@@ -240,7 +240,7 @@ watch(() => props.genre, (newVal) => {
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
-  background: linear-gradient(135deg, rgba(22, 25, 40, 0.9) 0%, rgba(15, 18, 29, 0.9) 100%);
+  background: linear-gradient(135deg, rgba(41, 32, 32, 0.95) 0%, rgba(26, 21, 21, 0.95) 100%);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 2rem;
@@ -257,7 +257,7 @@ watch(() => props.genre, (newVal) => {
   right: -50px;
   width: 250px;
   height: 250px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(230, 57, 70, 0.15) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -285,7 +285,7 @@ watch(() => props.genre, (newVal) => {
   padding: 0.2rem 0.65rem;
   background: var(--accent-gradient-subtle);
   border: 1px solid var(--border-accent);
-  color: #c7d2fe;
+  color: var(--accent);
   border-radius: var(--radius-full);
 }
 
@@ -345,8 +345,8 @@ watch(() => props.genre, (newVal) => {
 }
 
 .styled-select:focus {
-  border-color: var(--accent-purple);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.25);
 }
 
 .select-arrow {

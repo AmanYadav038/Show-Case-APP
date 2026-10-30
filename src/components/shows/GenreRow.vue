@@ -152,7 +152,7 @@ onUnmounted(() => {
   height: 24px;
   background: var(--accent-gradient);
   border-radius: var(--radius-full);
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
 }
 
 .genre-title {
@@ -165,11 +165,11 @@ onUnmounted(() => {
 .show-count-badge {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #c7d2fe;
-  background: rgba(99, 102, 241, 0.12);
+  color: var(--accent);
+  background: rgba(230, 57, 70, 0.14);
   padding: 0.2rem 0.6rem;
   border-radius: var(--radius-full);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(230, 57, 70, 0.25);
 }
 
 .header-right {
@@ -185,9 +185,9 @@ onUnmounted(() => {
   gap: 0.35rem;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #a5b4fc;
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  color: var(--accent);
+  background: rgba(230, 57, 70, 0.12);
+  border: 1px solid rgba(230, 57, 70, 0.28);
   padding: 0.35rem 0.75rem;
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
@@ -198,7 +198,7 @@ onUnmounted(() => {
   color: #fff;
   border-color: transparent;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.35);
 }
 
 .view-all-arrow {
@@ -240,7 +240,7 @@ onUnmounted(() => {
   color: #fff;
   border-color: transparent;
   transform: scale(1.08);
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 10px rgba(230, 57, 70, 0.45);
 }
 
 .nav-arrow-btn:disabled {

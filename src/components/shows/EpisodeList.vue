@@ -136,8 +136,9 @@ const currentSeasonEpisodes = computed(() => {
 .accent-bar {
   width: 4px;
   height: 20px;
-  background: var(--accent-gold);
+  background: var(--accent-gradient);
   border-radius: var(--radius-full);
+  box-shadow: 0 0 10px rgba(230, 57, 70, 0.45);
 }
 
 .section-title {
@@ -173,11 +174,12 @@ const currentSeasonEpisodes = computed(() => {
   border-radius: var(--radius-md);
   outline: none;
   cursor: pointer;
-  transition: border-color var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .season-dropdown:focus {
-  border-color: var(--accent-gold);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.25);
 }
 
 .episodes-list {

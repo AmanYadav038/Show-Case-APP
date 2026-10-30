@@ -264,8 +264,8 @@ watch(() => route.query.q, (newQ) => {
 }
 
 .main-search-input:focus {
-  border-color: var(--accent-purple);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.25);
 }
 
 .search-submit-btn {
@@ -376,7 +376,8 @@ watch(() => route.query.q, (newQ) => {
 }
 
 .sort-select:focus {
-  border-color: var(--accent-purple);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.25);
 }
 
 .no-results-box {

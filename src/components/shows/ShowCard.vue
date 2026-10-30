@@ -152,12 +152,12 @@ function handleWatchlistClick(e) {
 .show-card:hover {
   transform: translateY(-5px);
   border-color: var(--border-accent);
-  box-shadow: var(--shadow-md), 0 0 15px rgba(99, 102, 241, 0.2);
+  box-shadow: var(--shadow-md), 0 0 15px rgba(230, 57, 70, 0.25);
 }
 
 .show-card:focus-visible {
-  border-color: var(--accent-purple);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.4);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.35);
 }
 
 .poster-wrapper {
@@ -182,7 +182,7 @@ function handleWatchlistClick(e) {
 .poster-shadow-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(8, 9, 14, 0.85) 0%, rgba(8, 9, 14, 0.2) 35%, transparent 60%);
+  background: linear-gradient(to top, rgba(21, 19, 19, 0.9) 0%, rgba(21, 19, 19, 0.2) 35%, transparent 60%);
   pointer-events: none;
 }
 
@@ -195,7 +195,7 @@ function handleWatchlistClick(e) {
   justify-content: center;
   gap: 0.75rem;
   padding: 1rem;
-  background: linear-gradient(135deg, #161a2e, #0e111d);
+  background: linear-gradient(135deg, #2e2323, #1c1616);
   color: var(--text-muted);
   text-align: center;
 }
@@ -203,8 +203,8 @@ function handleWatchlistClick(e) {
 .fallback-icon {
   width: 38px;
   height: 38px;
-  color: var(--accent-purple);
-  opacity: 0.7;
+  color: var(--primary);
+  opacity: 0.8;
 }
 
 .fallback-text {
@@ -227,7 +227,7 @@ function handleWatchlistClick(e) {
   padding: 0.25rem 0.55rem;
   border-radius: var(--radius-sm);
   line-height: 1;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.45);
   letter-spacing: -0.01em;
   display: flex;
   align-items: center;
@@ -265,10 +265,10 @@ function handleWatchlistClick(e) {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(8, 9, 14, 0.7);
+  background: rgba(21, 19, 19, 0.75);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 248, 240, 0.14);
+  color: rgba(255, 248, 240, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -283,9 +283,9 @@ function handleWatchlistClick(e) {
 }
 
 .quick-watchlist-btn:hover {
-  background: rgba(8, 9, 14, 0.95);
+  background: rgba(21, 19, 19, 0.95);
   color: #fff;
-  border-color: var(--accent-purple);
+  border-color: var(--accent);
   transform: scale(1);
 }
 
@@ -295,7 +295,7 @@ function handleWatchlistClick(e) {
   color: #fff;
   background: var(--accent-gradient);
   border-color: transparent;
-  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 2px 10px rgba(230, 57, 70, 0.45);
 }
 
 .show-card:hover .quick-watchlist-btn {
@@ -326,10 +326,10 @@ function handleWatchlistClick(e) {
   font-size: 0.7rem;
   font-weight: 600;
   padding: 0.12rem 0.45rem;
-  background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: rgba(230, 57, 70, 0.15);
+  border: 1px solid rgba(230, 57, 70, 0.28);
   border-radius: var(--radius-sm);
-  color: #c7d2fe;
+  color: var(--accent);
 }
 
 .show-title {
@@ -345,6 +345,6 @@ function handleWatchlistClick(e) {
 }
 
 .show-card:hover .show-title {
-  color: #a5b4fc;
+  color: var(--accent);
 }
 </style>
