@@ -37,7 +37,7 @@ function handleMouseEnter() {
 }
 
 function handleMouseLeave() {
-  hidePreview(false)
+  hidePreview(true)
 }
 
 function handleClick() {
