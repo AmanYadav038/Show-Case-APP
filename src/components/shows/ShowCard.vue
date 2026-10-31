@@ -45,13 +45,6 @@ function handleClick() {
   router.push({ name: 'show-detail', params: { id: props.show.id } })
 }
 
-function handleKeyDown(e) {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault()
-    handleClick()
-  }
-}
-
 function handleWatchlistClick(e) {
   e.stopPropagation()
   toggleWatchlist(props.show)
@@ -68,7 +61,6 @@ function handleWatchlistClick(e) {
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
     @click="handleClick"
-    @keydown="handleKeyDown"
   >
     <!-- Poster Container -->
     <div class="poster-wrapper">

@@ -10,7 +10,6 @@ const { query, results, isSearching, handleInput, clearSearch } = useSearch()
 
 const isDropdownOpen = ref(false)
 const searchContainer = ref(null)
-const selectedIndex = ref(-1)
 
 const displayedResults = computed(() => results.value.slice(0, 7))
 
@@ -18,7 +17,6 @@ function onInput(event) {
   const val = event.target.value
   handleInput(val)
   isDropdownOpen.value = val.trim().length > 0
-  selectedIndex.value = -1
 }
 
 function onFocus() {
@@ -37,37 +35,8 @@ function submitSearch() {
   const q = query.value.trim()
   if (!q) return
 
-  // If item is highlighted with arrow keys
-  if (selectedIndex.value >= 0 && displayedResults.value[selectedIndex.value]) {
-    selectShow(displayedResults.value[selectedIndex.value])
-    return
-  }
-
   isDropdownOpen.value = false
   router.push({ name: 'search', query: { q } })
-}
-
-function handleKeyDown(e) {
-  if (!isDropdownOpen.value) return
-
-  if (e.key === 'ArrowDown') {
-    e.preventDefault()
-    if (selectedIndex.value < displayedResults.value.length - 1) {
-      selectedIndex.value++
-    }
-  } else if (e.key === 'ArrowUp') {
-    e.preventDefault()
-    if (selectedIndex.value > 0) {
-      selectedIndex.value--
-    } else {
-      selectedIndex.value = -1
-    }
-  } else if (e.key === 'Escape') {
-    isDropdownOpen.value = false
-  } else if (e.key === 'Enter') {
-    e.preventDefault()
-    submitSearch()
-  }
 }
 
 function handleClickOutside(e) {
@@ -88,10 +57,18 @@ onUnmounted(() => {
 <template>
   <div ref="searchContainer" class="search-bar-wrapper">
     <div class="search-input-box" :class="{ 'focused': isDropdownOpen }">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
+      <button
+        type="button"
+        class="search-icon-btn"
+        aria-label="Search"
+        title="Search"
+        @click="submitSearch"
+      >
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </button>
 
       <input
         type="search"
@@ -102,7 +79,6 @@ onUnmounted(() => {
         aria-label="Search shows"
         @input="onInput"
         @focus="onFocus"
-        @keydown="handleKeyDown"
       />
 
       <!-- Spinner indicator -->
@@ -138,14 +114,11 @@ onUnmounted(() => {
       <!-- Results list -->
       <ul v-else class="results-list" role="listbox">
         <li
-          v-for="(show, index) in displayedResults"
+          v-for="show in displayedResults"
           :key="show.id"
           class="result-item"
-          :class="{ 'active': index === selectedIndex }"
           role="option"
-          :aria-selected="index === selectedIndex"
           @click="selectShow(show)"
-          @mouseenter="selectedIndex = index"
         >
           <!-- Thumbnail -->
           <div class="result-thumb-wrapper">
@@ -214,15 +187,30 @@ onUnmounted(() => {
   box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.25);
 }
 
+.search-icon-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  margin-right: 0.55rem;
+  transition: color var(--transition-fast);
+}
+
+.search-icon-btn:hover {
+  color: var(--primary);
+}
+
 .search-icon {
   width: 18px;
   height: 18px;
-  color: var(--text-muted);
   flex-shrink: 0;
-  margin-right: 0.55rem;
 }
 
-.search-input-box:focus-within .search-icon {
+.search-input-box:focus-within .search-icon-btn {
   color: var(--primary);
 }
 

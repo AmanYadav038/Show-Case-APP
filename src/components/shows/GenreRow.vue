@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref } from 'vue'
 import ShowCard from './ShowCard.vue'
 
 const props = defineProps({
@@ -22,15 +22,6 @@ const props = defineProps({
 })
 
 const scrollContainer = ref(null)
-const canScrollLeft = ref(false)
-const canScrollRight = ref(false)
-
-function checkScrollBounds() {
-  const el = scrollContainer.value
-  if (!el) return
-  canScrollLeft.value = el.scrollLeft > 10
-  canScrollRight.value = el.scrollLeft + el.clientWidth < el.scrollWidth - 10
-}
 
 function scroll(direction) {
   const el = scrollContainer.value
@@ -41,17 +32,6 @@ function scroll(direction) {
     behavior: 'smooth'
   })
 }
-
-onMounted(() => {
-  nextTick(() => {
-    checkScrollBounds()
-    window.addEventListener('resize', checkScrollBounds)
-  })
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', checkScrollBounds)
-})
 </script>
 
 <template>
@@ -81,7 +61,6 @@ onUnmounted(() => {
         <div class="nav-controls">
           <button
             class="nav-arrow-btn"
-            :disabled="!canScrollLeft"
             aria-label="Scroll left"
             @click="scroll('left')"
           >
@@ -91,7 +70,6 @@ onUnmounted(() => {
           </button>
           <button
             class="nav-arrow-btn"
-            :disabled="!canScrollRight"
             aria-label="Scroll right"
             @click="scroll('right')"
           >
@@ -108,7 +86,6 @@ onUnmounted(() => {
       <div
         ref="scrollContainer"
         class="horizontal-scroll-track"
-        @scroll.passive="checkScrollBounds"
       >
         <div
           v-for="(show, index) in shows"
