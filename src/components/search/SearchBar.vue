@@ -99,7 +99,7 @@ onUnmounted(() => {
       </button>
     </div>
 
-    <!-- IMDb-style Live Suggestions Dropdown -->
+    <!-- Live Suggestions Dropdown -->
     <div v-if="isDropdownOpen && query.trim()" class="search-dropdown fade-in">
       <!-- Loading indicator text -->
       <div v-if="isSearching && !displayedResults.length" class="dropdown-status">
