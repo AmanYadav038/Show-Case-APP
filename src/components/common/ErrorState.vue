@@ -90,8 +90,8 @@ const emit = defineEmits(['retry'])
   align-items: center;
   gap: 0.5rem;
   padding: 0.65rem 1.35rem;
-  background: var(--accent-gold);
-  color: #000;
+  background: var(--accent-gradient);
+  color: #fff;
   font-weight: 700;
   font-size: 0.9rem;
   border-radius: var(--radius-md);
@@ -99,7 +99,7 @@ const emit = defineEmits(['retry'])
 }
 
 .retry-btn:hover {
-  background: var(--accent-gold-hover);
+  background: var(--accent-gradient-hover);
   transform: translateY(-1px);
 }
 
