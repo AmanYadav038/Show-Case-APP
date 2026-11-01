@@ -1,9 +1,37 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, beforeAll } from 'vitest'
 import { useWatchlist } from '../../src/composables/useWatchlist.js'
+
+// In-memory mock storage ensuring compatibility across Node 18, 20, 22+
+const storageMock = (() => {
+  let store = {}
+  return {
+    getItem: (key) => store[key] || null,
+    setItem: (key, val) => { store[key] = String(val) },
+    clear: () => { store = {} },
+    removeItem: (key) => { delete store[key] }
+  }
+})()
+
+beforeAll(() => {
+  if (typeof window !== 'undefined' && !window.localStorage) {
+    Object.defineProperty(window, 'localStorage', { value: storageMock, writable: true })
+  }
+  if (typeof globalThis !== 'undefined' && (!globalThis.localStorage || typeof globalThis.localStorage.clear !== 'function')) {
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: typeof window !== 'undefined' && window.localStorage ? window.localStorage : storageMock,
+      writable: true,
+      configurable: true
+    })
+  }
+})
 
 describe('useWatchlist composable', () => {
   beforeEach(() => {
-    localStorage.clear()
+    if (typeof window !== 'undefined' && window.localStorage && typeof window.localStorage.clear === 'function') {
+      window.localStorage.clear()
+    } else if (typeof localStorage !== 'undefined' && localStorage && typeof localStorage.clear === 'function') {
+      localStorage.clear()
+    }
     const { watchlist } = useWatchlist()
     watchlist.value = []
   })

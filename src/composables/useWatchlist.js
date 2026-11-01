@@ -5,21 +5,34 @@ const STORAGE_KEY = 'showcase_watchlist'
 // Shared reactive state across components
 const watchlist = ref(loadWatchlist())
 
+function getStorage() {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    return window.localStorage
+  }
+  if (typeof globalThis !== 'undefined' && globalThis.localStorage && typeof globalThis.localStorage.getItem === 'function') {
+    return globalThis.localStorage
+  }
+  return null
+}
+
 function loadWatchlist() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('cinemaze_watchlist')
+    const storage = getStorage()
+    if (!storage) return []
+    const raw = storage.getItem(STORAGE_KEY) || storage.getItem('cinemaze_watchlist')
     return raw ? JSON.parse(raw) : []
   } catch (e) {
-    console.warn('Failed to read watchlist from localStorage', e)
     return []
   }
 }
 
 function saveWatchlist(items) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+    const storage = getStorage()
+    if (!storage) return
+    storage.setItem(STORAGE_KEY, JSON.stringify(items))
   } catch (e) {
-    console.warn('Failed to save watchlist to localStorage', e)
+    // Safely ignore storage quota or incognito restriction errors
   }
 }
 
