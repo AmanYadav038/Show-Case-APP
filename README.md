@@ -21,7 +21,7 @@ Vue 3 was chosen as the frontend framework for this project for several concrete
    Vue provides first-class primitives for page transitions. Wrapping `<router-view>` in `<transition mode="out-in">` enabled smooth page-fade animations between views without pulling in external animation libraries.
 
 5. **Minimal Boilerplate & Scaffolding**  
-   In alignment with the requirement to avoid heavy boilerplates and plugins, Vue 3 provides built-in reactivity, state management, and template compilation with almost zero setup overhead. We avoided heavy state libraries (like Pinia or Vuex) by leveraging Vue's native reactive primitives as module-level singletons.
+   In alignment with the requirement to avoid heavy boilerplates and plugins, Vue 3 provides built-in reactivity, state management, and template compilation with almost zero 0setup overhead. We avoided heavy state libraries (like Pinia or Vuex) by leveraging Vue's native reactive primitives as module-level singletons.
 
 ---
 
