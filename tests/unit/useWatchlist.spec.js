@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, beforeAll } from 'vitest'
 import { useWatchlist } from '../../src/composables/useWatchlist.js'
 
-// In-memory mock storage ensuring compatibility across Node 18, 20, 22+
+// In-memory mock storage
 const storageMock = (() => {
   let store = {}
   return {
