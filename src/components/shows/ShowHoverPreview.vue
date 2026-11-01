@@ -1,16 +1,38 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useHoverPreview } from '../../composables/useHoverPreview.js'
 import { useWatchlist } from '../../composables/useWatchlist.js'
 import { stripHtml, formatYearRange, formatRuntime, getImageUrl } from '../../utils/formatters.js'
 import RatingBadge from '../common/RatingBadge.vue'
 
 const router = useRouter()
+const route = useRoute()
 const { activeShow, anchorRect, isVisible, hidePreview, keepPreviewOpen } = useHoverPreview()
 const { isInWatchlist, toggleWatchlist } = useWatchlist()
 
 const cardRef = ref(null)
+
+// Auto-dismiss preview on route changes
+watch(() => route?.fullPath, () => {
+  hidePreview(true)
+})
+
+function handleScrollOrResize() {
+  if (isVisible.value) {
+    hidePreview(true)
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScrollOrResize, { passive: true })
+  window.addEventListener('resize', handleScrollOrResize, { passive: true })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScrollOrResize)
+  window.removeEventListener('resize', handleScrollOrResize)
+})
 
 const positionStyle = computed(() => {
   if (!anchorRect.value) return { display: 'none' }
@@ -378,5 +400,11 @@ function handleWatchlistToggle() {
 .popover-fade-leave-to {
   opacity: 0;
   transform: scale(0.96) translateY(4px);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .hover-popover-card {
+    display: none !important;
+  }
 }
 </style>

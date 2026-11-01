@@ -92,4 +92,3 @@ Generates an optimized, minified production bundle in the `dist/` directory.
 ```bash
 npm run preview
 ```
-Spins up a local static server to test the production build locally.

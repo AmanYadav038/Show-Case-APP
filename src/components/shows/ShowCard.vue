@@ -31,13 +31,16 @@ const primaryGenre = computed(() => props.show.genres?.[0] || null)
 const isBookmarked = computed(() => isInWatchlist(props.show.id))
 
 function handleMouseEnter() {
+  if (typeof window !== 'undefined' && window.matchMedia && !window.matchMedia('(hover: hover)').matches) {
+    return
+  }
   if (cardRef.value) {
     showPreview(props.show, cardRef.value)
   }
 }
 
 function handleMouseLeave() {
-  hidePreview(true)
+  hidePreview(false)
 }
 
 function handleClick() {

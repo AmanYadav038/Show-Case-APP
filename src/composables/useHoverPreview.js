@@ -19,7 +19,7 @@ export function useHoverPreview() {
       anchorRect.value = rect
       activeShow.value = show
       isVisible.value = true
-    }, 400) // 400ms debounce for natural feel
+    }, 280) // 280ms debounce for natural, responsive feel
   }
 
   function hidePreview(immediate = false) {
