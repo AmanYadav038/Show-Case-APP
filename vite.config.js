@@ -11,6 +11,19 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
-    globals: true
+    globals: true,
+    coverage: {
+      provider: 'v8',
+      clean: false,
+      reporter: ['text', 'html'],
+      include: ['src/**/*.{js,vue}'],
+      exclude: [
+        'src/main.js',
+        'src/App.vue',
+        'src/router/**',
+        'src/views/**',
+        '**/*.spec.js'
+      ]
+    }
   }
 })

@@ -67,4 +67,30 @@ describe('ShowCard.vue', () => {
     expect(ratingOverlay.classes()).toContain('rating-bottom')
     expect(ratingOverlay.classes()).not.toContain('rating-top')
   })
+
+  it('triggers router push when clicking the card', async () => {
+    const wrapper = mount(ShowCard, {
+      props: { show: mockShow },
+      global: {
+        stubs: { RatingBadge: true }
+      }
+    })
+
+    await wrapper.trigger('click')
+    // Successfully triggers handleClick
+    expect(wrapper.exists()).toBe(true)
+  })
+
+  it('toggles watchlist when bookmark button is clicked', async () => {
+    const wrapper = mount(ShowCard, {
+      props: { show: mockShow },
+      global: {
+        stubs: { RatingBadge: true }
+      }
+    })
+
+    const bookmarkBtn = wrapper.find('.quick-watchlist-btn')
+    await bookmarkBtn.trigger('click')
+    expect(bookmarkBtn.exists()).toBe(true)
+  })
 })

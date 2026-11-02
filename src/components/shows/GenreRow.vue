@@ -27,10 +27,14 @@ function scroll(direction) {
   const el = scrollContainer.value
   if (!el) return
   const scrollDistance = el.clientWidth * 0.75
-  el.scrollBy({
-    left: direction === 'left' ? -scrollDistance : scrollDistance,
-    behavior: 'smooth'
-  })
+  if (typeof el.scrollBy === 'function') {
+    el.scrollBy({
+      left: direction === 'left' ? -scrollDistance : scrollDistance,
+      behavior: 'smooth'
+    })
+  } else {
+    el.scrollLeft += direction === 'left' ? -scrollDistance : scrollDistance
+  }
 }
 </script>
 

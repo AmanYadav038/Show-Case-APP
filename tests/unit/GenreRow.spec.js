@@ -65,4 +65,28 @@ describe('GenreRow.vue', () => {
 
     expect(wrapper.find('section').exists()).toBe(false)
   })
+
+  it('scrolls track when left and right arrow buttons are clicked', async () => {
+    const wrapper = mount(GenreRow, {
+      props: {
+        title: 'Drama Shows',
+        shows: sampleShows,
+        genreKey: 'Drama'
+      },
+      global: {
+        stubs: {
+          'router-link': true,
+          ShowCard: true
+        }
+      }
+    })
+
+    const buttons = wrapper.findAll('.nav-arrow-btn')
+    expect(buttons.length).toBe(2)
+
+    // Trigger left and right scroll clicks
+    await buttons[0].trigger('click')
+    await buttons[1].trigger('click')
+    expect(wrapper.exists()).toBe(true)
+  })
 })

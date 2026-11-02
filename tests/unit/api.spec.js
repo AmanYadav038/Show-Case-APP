@@ -28,7 +28,17 @@ describe('tvmazeApi service', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('fetchShowDetails retrieves show with embedded details', async () => {
+  it('fetchShows throws error when network response is not ok', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error'
+    })
+
+    await expect(fetchShows(0)).rejects.toThrow('TVMaze API error: 500')
+  })
+
+  it('fetchShowDetails retrieves show with embedded details and caches it', async () => {
     const mockShow = {
       id: 1,
       name: 'Under the Dome',
@@ -43,9 +53,34 @@ describe('tvmazeApi service', () => {
     const result = await fetchShowDetails(1)
     expect(result.id).toBe(1)
     expect(fetchSpy).toHaveBeenCalledWith('https://api.tvmaze.com/shows/1?embed[]=cast&embed[]=episodes')
+
+    // Second call comes from cache
+    const cachedResult = await fetchShowDetails(1)
+    expect(cachedResult.id).toBe(1)
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('searchShows returns formatted show list with searchScore', async () => {
+  it('fetchShowDetails handles 404 not found specifically', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+      statusText: 'Not Found'
+    })
+
+    await expect(fetchShowDetails(999999)).rejects.toThrow('TV Show not found')
+  })
+
+  it('fetchShowDetails handles generic HTTP error', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: false,
+      status: 502,
+      statusText: 'Bad Gateway'
+    })
+
+    await expect(fetchShowDetails(123)).rejects.toThrow('TVMaze API error: 502')
+  })
+
+  it('searchShows returns formatted show list with searchScore and caches it', async () => {
     const mockResponse = [
       { score: 17.5, show: { id: 169, name: 'Breaking Bad' } }
     ]
@@ -59,6 +94,21 @@ describe('tvmazeApi service', () => {
     expect(results.length).toBe(1)
     expect(results[0].name).toBe('Breaking Bad')
     expect(results[0].searchScore).toBe(17.5)
+
+    // Second search should come from cache
+    const cachedResults = await searchShows('Breaking Bad')
+    expect(cachedResults.length).toBe(1)
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('searchShows throws error when search response is not ok', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: 'Server Error'
+    })
+
+    await expect(searchShows('crash')).rejects.toThrow('TVMaze search error: 500')
   })
 
   it('searchShows returns empty array for blank query', async () => {
