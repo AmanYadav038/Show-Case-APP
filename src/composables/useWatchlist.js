@@ -19,7 +19,7 @@ function loadWatchlist() {
   try {
     const storage = getStorage()
     if (!storage) return []
-    const raw = storage.getItem(STORAGE_KEY) || storage.getItem('cinemaze_watchlist')
+    const raw = storage.getItem(STORAGE_KEY)
     return raw ? JSON.parse(raw) : []
   } catch (e) {
     return []
@@ -32,7 +32,7 @@ function saveWatchlist(items) {
     if (!storage) return
     storage.setItem(STORAGE_KEY, JSON.stringify(items))
   } catch (e) {
-    // Safely ignore storage quota or incognito restriction errors
+    return
   }
 }
 
