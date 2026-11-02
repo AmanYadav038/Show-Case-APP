@@ -8,7 +8,6 @@ import RatingBadge from '../common/RatingBadge.vue'
 const props = defineProps({
   shows: {
     type: Array,
-    required: true,
     default: () => []
   }
 })
@@ -21,7 +20,7 @@ let timer = null
 
 const currentShow = computed(() => {
   if (!props.shows || props.shows.length === 0) return null
-  return props.shows[currentIndex.value] || props.shows[0]
+  return props.shows[currentIndex.value]
 })
 
 const backdropUrl = computed(() => {
@@ -51,11 +50,6 @@ const isBookmarked = computed(() => {
 function nextSlide() {
   if (props.shows.length <= 1) return
   currentIndex.value = (currentIndex.value + 1) % props.shows.length
-}
-
-function prevSlide() {
-  if (props.shows.length <= 1) return
-  currentIndex.value = (currentIndex.value - 1 + props.shows.length) % props.shows.length
 }
 
 function setSlide(index) {
