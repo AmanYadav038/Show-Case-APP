@@ -51,11 +51,12 @@ No component libraries (such as Vuetify, Bootstrap, or Tailwind) were used. The 
 * **Cross-Environment Storage Safety**: The watchlist composable safely checks for storage availability, avoiding crashes in strict privacy modes or restricted Node/browser environments.
 
 ### 5. Automated Unit Testing
-A suite of 34 unit tests built with **Vitest** and **`@vue/test-utils`** runs in a headless JSDOM environment, covering:
+A suite of 47 unit tests built with **Vitest** and **`@vue/test-utils`** runs in a headless JSDOM environment across 9 test suites, covering:
 * Pure utility transformations (date ranges, runtimes, HTML entity stripping).
 * API service mocking and in-memory cache verification.
 * Watchlist state mutations and storage persistence.
-* Component rendering, prop handling, and badge placement.
+* Hover preview popover timing, debounce logic, and cancellation.
+* Component rendering, prop handling, skeleton shapes, error recovery, and badge placement.
 
 ---
 
@@ -80,7 +81,7 @@ Once started, open the local URL shown in your terminal (typically `http://local
 ```bash
 npm test
 ```
-Runs all 34 Vitest unit tests in headless mode.
+Runs all 47 Vitest unit tests in headless mode.
 
 ### 4. Build for Production
 ```bash
