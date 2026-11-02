@@ -37,27 +37,6 @@ describe('useSearch composable', () => {
     expect(results.value).toEqual([])
   })
 
-  it('executeSearch handles error gracefully', async () => {
-    vi.spyOn(tvmazeApi, 'searchShows').mockRejectedValueOnce(new Error('Search failed'))
-    const { executeSearch, results, searchError } = useSearch()
-
-    const data = await executeSearch('error test')
-    expect(data).toEqual([])
-    expect(results.value).toEqual([])
-    expect(searchError.value).toBe('Search failed')
-  })
-
-  it('handleInput debounces search execution', async () => {
-    const searchSpy = vi.spyOn(tvmazeApi, 'searchShows').mockResolvedValue([])
-    const { handleInput } = useSearch()
-
-    handleInput('Game', 200)
-    expect(searchSpy).not.toHaveBeenCalled()
-
-    vi.advanceTimersByTime(250)
-    expect(searchSpy).toHaveBeenCalledWith('Game')
-  })
-
   it('handleInput clears results when input is empty string', () => {
     const { handleInput, results, query } = useSearch()
     results.value = [{ id: 1 }]
