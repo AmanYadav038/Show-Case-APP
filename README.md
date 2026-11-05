@@ -1,6 +1,6 @@
 # ShowCase — TV Shows Explorer
 
-A responsive single-page web application built with **Vue 3** and **Vite**, powered by the open [TVMaze REST API](https://www.tvmaze.com/api). The application displays popular TV shows organized by genre, top-rated rankings, an IMDb-style hover preview popover, live search auto-completion, dedicated genre browsing with multi-criteria sorting, and a client-side watchlist persisted in `localStorage`.
+A responsive single-page web application built with **Vue 3** and **Vite**, powered by the open [TVMaze REST API](https://www.tvmaze.com/api). The application displays popular TV shows organized by genre, top-rated rankings, an IMDb-style hover preview popover, live search, dedicated genre browsing with multi-criteria sorting, and a client-side watchlist persisted in `localStorage`.
 
 ---
 
@@ -21,7 +21,7 @@ Vue 3 was chosen as the frontend framework for this project for several concrete
    Vue provides first-class primitives for page transitions. Wrapping `<router-view>` in `<transition mode="out-in">` enabled smooth page-fade animations between views without pulling in external animation libraries.
 
 5. **Minimal Boilerplate & Scaffolding**  
-   In alignment with the requirement to avoid heavy boilerplates and plugins, Vue 3 provides built-in reactivity, state management, and template compilation with almost zero 0setup overhead. We avoided heavy state libraries (like Pinia or Vuex) by leveraging Vue's native reactive primitives as module-level singletons.
+   In alignment with the requirement to avoid heavy boilerplates and plugins, Vue 3 provides built-in reactivity, state management, and template compilation with almost zero setup overhead. We avoided heavy state libraries (like Pinia or Vuex) by leveraging Vue's native reactive primitives as module-level singletons.
 
 ---
 
@@ -43,7 +43,6 @@ No component libraries (such as Vuetify, Bootstrap, or Tailwind) were used. The 
 ### 3. Performance & Memory Optimizations
 * **Teleported Singleton Pattern**: Instead of rendering a hidden hover preview inside every single `ShowCard` (which would bloat the DOM with 100+ duplicate popovers), a single `<ShowHoverPreview />` is mounted at the root in `App.vue` and teleports to `<body>`. It calculates its position dynamically when any card is hovered.
 * **Debounced Inputs**: Live search and hover previews use debouncing (250ms) to avoid triggering unnecessary API requests or flickering popovers when the mouse moves across cards.
-* **Native Smooth Scrolling**: Horizontal genre carousels use native DOM `scrollBy({ left, behavior: 'smooth' })`, calculating a responsive distance based on `clientWidth * 0.75` without requiring external carousel dependencies.
 
 ### 4. User Experience & Defensive Programming
 * **Layout Stability (No Cumulative Layout Shift)**: `LoadingSkeleton.vue` mirrors the exact dimensions and aspect ratios (`aspect-ratio: 2 / 3`) of the cards and banners, preventing content jump when images finish loading.
