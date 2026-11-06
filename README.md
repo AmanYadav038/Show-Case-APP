@@ -50,7 +50,7 @@ No component libraries (such as Vuetify, Bootstrap, or Tailwind) were used. The 
 * **Cross-Environment Storage Safety**: The watchlist composable safely checks for storage availability, avoiding crashes in strict privacy modes or restricted Node/browser environments.
 
 ### 5. Automated Unit Testing
-A suite of 47 unit tests built with **Vitest** and **`@vue/test-utils`** runs in a headless JSDOM environment across 9 test suites, covering:
+A suite of 53 unit tests built with **Vitest** and **`@vue/test-utils`** runs in a headless JSDOM environment across 9 test suites, covering:
 * Pure utility transformations (date ranges, runtimes, HTML entity stripping).
 * API service mocking and in-memory cache verification.
 * Watchlist state mutations and storage persistence.
