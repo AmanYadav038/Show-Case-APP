@@ -141,7 +141,7 @@ onUnmounted(() => {
       <!-- Action Buttons -->
       <div class="hero-actions">
         <button class="hero-btn-primary" @click="goToDetail">
-          <svg class="btn-icon" viewBox="0 0 24 24">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z" />
           </svg>
           <span>View Details</span>
