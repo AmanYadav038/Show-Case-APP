@@ -1,31 +1,33 @@
 <script setup>
 import { useWatchlist } from '../composables/useWatchlist.js'
+import { useI18n } from '../composables/useI18n.js'
 import ShowCard from '../components/shows/ShowCard.vue'
 
 const { watchlist } = useWatchlist()
+const { t } = useI18n()
 </script>
 
 <template>
   <main class="watchlist-page container">
     <div class="watchlist-header">
       <div class="header-left">
-        <h1 class="page-title">My Watchlist</h1>
-        <span class="count-pill">{{ watchlist.length }} shows saved</span>
+        <h1 class="page-title">{{ t('watchlist.title') }}</h1>
+        <span class="count-pill">{{ t('watchlist.countPill', { count: watchlist.length }) }}</span>
       </div>
       <p class="page-desc">
-        Keep track of TV shows and series you want to watch or are currently following.
+        {{ t('watchlist.subtitle') }}
       </p>
     </div>
 
     <!-- Empty Watchlist State -->
     <div v-if="!watchlist.length" class="empty-watchlist-box">
       <div class="empty-icon">🔖</div>
-      <h3 class="empty-title">Your Watchlist is Empty</h3>
+      <h3 class="empty-title">{{ t('watchlist.emptyTitle') }}</h3>
       <p class="empty-desc">
-        Browse popular TV shows across genres and tap the bookmark icon on any card to save it here.
+        {{ t('watchlist.emptyDesc') }}
       </p>
       <router-link to="/" class="browse-btn">
-        Browse TV Shows
+        {{ t('watchlist.discoverBtn') }}
       </router-link>
     </div>
 

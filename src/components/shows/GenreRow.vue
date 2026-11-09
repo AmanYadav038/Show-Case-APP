@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from '../../composables/useI18n.js'
 import ShowCard from './ShowCard.vue'
 
 const props = defineProps({
@@ -21,7 +22,18 @@ const props = defineProps({
   }
 })
 
+const { t, translateGenre } = useI18n()
 const scrollContainer = ref(null)
+
+const displayTitle = computed(() => {
+  if (props.isRanked || props.genreKey?.toLowerCase() === 'top-rated') {
+    return t('dashboard.topRatedTitle')
+  }
+  if (props.genreKey) {
+    return t('dashboard.genreShowsTitle', { genre: translateGenre(props.genreKey) })
+  }
+  return props.title
+})
 
 function scroll(direction) {
   const el = scrollContainer.value
@@ -44,8 +56,7 @@ function scroll(direction) {
     <div class="row-header">
       <div class="header-left">
         <div class="header-accent-bar"></div>
-        <h2 class="genre-title">{{ title }}</h2>
-        <span class="show-count-badge">{{ shows.length }} shows</span>
+        <h2 class="genre-title">{{ displayTitle }}</h2>
       </div>
 
       <!-- Controls: View All Link & Arrow Navigation -->
@@ -54,9 +65,9 @@ function scroll(direction) {
         <router-link
           :to="{ name: 'genre-detail', params: { genre: genreKey || 'Drama' } }"
           class="view-all-link"
-          :title="`View all ${title}`"
+          :title="`View all ${displayTitle}`"
         >
-          <span>View All</span>
+          <span>{{ t('dashboard.viewAll') }}</span>
           <svg class="view-all-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="9 18 15 12 9 6" />
           </svg>

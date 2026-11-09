@@ -2,11 +2,13 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWatchlist } from '../../composables/useWatchlist.js'
+import { useI18n } from '../../composables/useI18n.js'
 import { CURATED_GENRES } from '../../composables/useShows.js'
 import SearchBar from '../search/SearchBar.vue'
 
 const router = useRouter()
 const { watchlist } = useWatchlist()
+const { currentLocale, toggleLocale, t, translateGenre } = useI18n()
 
 const isMobileMenuOpen = ref(false)
 const isGenreDropdownOpen = ref(false)
@@ -64,7 +66,7 @@ onUnmounted(() => {
 
         <nav class="desktop-nav">
           <router-link to="/" class="nav-link" active-class="active">
-            Dashboard
+            {{ t('nav.discover') }}
           </router-link>
 
           <!-- Genre Dropdown Menu (Global, works on Watchlist & every view) -->
@@ -74,7 +76,7 @@ onUnmounted(() => {
               :class="{ 'active': $route.name === 'genre-detail' || isGenreDropdownOpen }"
               @click.stop="toggleGenreDropdown"
             >
-              <span>Genres</span>
+              <span>{{ t('nav.genres') }}</span>
               <svg 
                 class="chevron-icon" 
                 :class="{ 'rotate': isGenreDropdownOpen }" 
@@ -89,7 +91,7 @@ onUnmounted(() => {
 
             <!-- Dropdown Menu Box -->
             <div v-if="isGenreDropdownOpen" class="genre-dropdown-menu fade-in">
-              <div class="dropdown-header">Browse by Genre</div>
+              <div class="dropdown-header">{{ t('nav.browseGenre') }}</div>
               <div class="dropdown-grid">
                 <button
                   v-for="g in allNavGenres"
@@ -99,14 +101,14 @@ onUnmounted(() => {
                   @click="selectGenre(g)"
                 >
                   <span v-if="g === 'Top-Rated'" class="star-icon">⭐</span>
-                  <span>{{ g }}</span>
+                  <span>{{ translateGenre(g) }}</span>
                 </button>
               </div>
             </div>
           </div>
 
           <router-link to="/watchlist" class="nav-link watchlist-link" active-class="active">
-            <span>Watchlist</span>
+            <span>{{ t('nav.watchlist') }}</span>
             <span v-if="watchlist.length" class="watchlist-count">
               {{ watchlist.length }}
             </span>
@@ -118,6 +120,25 @@ onUnmounted(() => {
       <div class="header-search">
         <SearchBar />
       </div>
+
+      <!-- Language Switcher Toggle (EN / हिंदी) -->
+      <button
+        class="lang-toggle-btn"
+        :title="currentLocale === 'en' ? 'Switch to Hindi (हिंदी)' : 'Switch to English (अंग्रेज़ी)'"
+        aria-label="Toggle language between English and Hindi"
+        @click="toggleLocale"
+      >
+        <svg class="globe-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+        <span class="lang-text">
+          <span :class="{ 'lang-active': currentLocale === 'en' }">EN</span>
+          <span class="lang-slash">|</span>
+          <span :class="{ 'lang-active': currentLocale === 'hi' }">हिं</span>
+        </span>
+      </button>
 
       <!-- Mobile Hamburger Button -->
       <button
@@ -145,11 +166,11 @@ onUnmounted(() => {
       </div>
       <nav class="mobile-nav-links">
         <router-link to="/" class="mobile-link" @click="closeMobileMenu">
-          Dashboard
+          {{ t('nav.discover') }}
         </router-link>
 
         <div class="mobile-genre-section">
-          <div class="mobile-section-title">Select Genre</div>
+          <div class="mobile-section-title">{{ t('nav.selectGenre') }}</div>
           <div class="mobile-genre-chips">
             <button
               v-for="g in allNavGenres"
@@ -158,14 +179,20 @@ onUnmounted(() => {
               :class="{ active: $route.params.genre === g }"
               @click="selectGenre(g)"
             >
-              {{ g }}
+              {{ translateGenre(g) }}
             </button>
           </div>
         </div>
 
         <router-link to="/watchlist" class="mobile-link" @click="closeMobileMenu">
-          Watchlist ({{ watchlist.length }})
+          {{ t('nav.watchlist') }} ({{ watchlist.length }})
         </router-link>
+
+        <!-- Mobile Language Switcher -->
+        <button class="mobile-lang-btn" @click="toggleLocale">
+          <span class="mobile-globe">🌐</span>
+          <span>{{ currentLocale === 'en' ? 'हिन्दी में बदलें (Hindi)' : 'Switch to English (अंग्रेज़ी)' }}</span>
+        </button>
       </nav>
     </div>
   </header>
@@ -468,5 +495,75 @@ onUnmounted(() => {
 .mobile-genre-chip.active {
   background: var(--accent-gradient);
   color: #fff;
+}
+
+/* Language Toggle Button Styles */
+.lang-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+  color: var(--text-secondary);
+  padding: 0.38rem 0.75rem;
+  border-radius: var(--radius-full, 9999px);
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.2s);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.lang-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-accent, rgba(230, 57, 70, 0.4));
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.globe-svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--accent, #e63946);
+  flex-shrink: 0;
+}
+
+.lang-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  letter-spacing: 0.03em;
+}
+
+.lang-slash {
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.lang-active {
+  color: #fff;
+  font-weight: 800;
+}
+
+.mobile-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
+  color: #fff;
+  padding: 0.55rem 0.95rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.mobile-globe {
+  font-size: 1.1rem;
 }
 </style>

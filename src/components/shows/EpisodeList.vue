@@ -1,5 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useDataSaver } from '../../composables/useDataSaver.js'
+import { useI18n } from '../../composables/useI18n.js'
 import { stripHtml, formatRating, formatRuntime } from '../../utils/formatters.js'
 import RatingBadge from '../common/RatingBadge.vue'
 
@@ -9,6 +11,9 @@ const props = defineProps({
     default: () => []
   }
 })
+
+const { isDataSaverActive } = useDataSaver()
+const { t } = useI18n()
 
 // Group episodes by season
 const seasonsMap = computed(() => {
@@ -46,13 +51,13 @@ const currentSeasonEpisodes = computed(() => {
     <div class="episodes-header">
       <div class="header-left">
         <div class="accent-bar"></div>
-        <h3 class="section-title">Episodes</h3>
-        <span class="episodes-total">({{ episodes.length }} total)</span>
+        <h3 class="section-title">{{ t('showDetail.episodes') }}</h3>
+        <span class="episodes-total">{{ t('showDetail.episodesTotal', { count: episodes.length }) }}</span>
       </div>
 
       <!-- Season Tabs -->
       <div class="season-selector-wrapper">
-        <label for="season-select" class="season-label">Season:</label>
+        <label for="season-select" class="season-label">{{ t('showDetail.seasonSelect') }}</label>
         <select
           id="season-select"
           v-model="selectedSeason"
@@ -63,7 +68,7 @@ const currentSeasonEpisodes = computed(() => {
             :key="s"
             :value="s"
           >
-            Season {{ s }} ({{ seasonsMap[s].length }} eps)
+            {{ t('showDetail.seasonOption', { season: s, count: seasonsMap[s].length }) }}
           </option>
         </select>
       </div>
@@ -79,7 +84,7 @@ const currentSeasonEpisodes = computed(() => {
         <!-- Ep Thumbnail -->
         <div class="ep-thumb-wrapper">
           <img
-            v-if="ep.image?.medium"
+            v-if="!isDataSaverActive && ep.image?.medium"
             :src="ep.image.medium"
             :alt="ep.name"
             class="ep-thumb-img"

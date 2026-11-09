@@ -1,14 +1,16 @@
 import { ref } from 'vue'
-import { searchShows } from '../services/tvmazeApi.js'
+import { searchShows, searchPeople } from '../services/tvmazeApi.js'
+import { CURATED_GENRES } from './useShows.js'
 
 export function useSearch() {
   const query = ref('')
   const results = ref([])
   const isSearching = ref(false)
   const searchError = ref(null)
+  const searchScope = ref('all') // 'all' | 'shows' | 'actors' | 'genres'
   let debounceTimer = null
 
-  async function executeSearch(searchText) {
+  async function executeSearch(searchText, scope = searchScope.value) {
     const trimmed = (searchText ?? query.value).trim()
     if (!trimmed) {
       results.value = []
@@ -21,7 +23,54 @@ export function useSearch() {
     searchError.value = null
 
     try {
-      const data = await searchShows(trimmed)
+      let data = []
+      if (scope === 'actors') {
+        const people = await searchPeople(trimmed)
+        data = people.map(p => ({
+          ...p,
+          resultType: 'person'
+        }))
+      } else if (scope === 'genres') {
+        const lower = trimmed.toLowerCase()
+        const matchedGenres = CURATED_GENRES.filter(g => g.toLowerCase().includes(lower))
+        const shows = await searchShows(trimmed)
+        const genreShows = shows.filter(s => Array.isArray(s.genres) && s.genres.some(g => g.toLowerCase().includes(lower)))
+
+        const genreItems = matchedGenres.map(g => ({
+          id: `genre-${g}`,
+          name: `${g} Shows`,
+          genreName: g,
+          resultType: 'genre'
+        }))
+        data = [...genreItems, ...genreShows]
+      } else if (scope === 'shows') {
+        data = await searchShows(trimmed)
+      } else {
+        // 'all'
+        const shows = await searchShows(trimmed)
+        let people = []
+        try {
+          const peopleRes = await searchPeople(trimmed)
+          people = (peopleRes || []).slice(0, 3).map(p => ({
+            ...p,
+            resultType: 'person'
+          }))
+        } catch (e) {
+          people = []
+        }
+
+        const lower = trimmed.toLowerCase()
+        const matchedGenre = CURATED_GENRES.find(g => g.toLowerCase() === lower || g.toLowerCase().startsWith(lower))
+        const genreItems = matchedGenre ? [{
+          id: `genre-${matchedGenre}`,
+          name: `Explore all ${matchedGenre} TV Shows`,
+          genreName: matchedGenre,
+          resultType: 'genre'
+        }] : []
+
+        data = [...genreItems, ...people, ...shows]
+      }
+
       results.value = data
       return data
     } catch (err) {
@@ -30,6 +79,13 @@ export function useSearch() {
       return []
     } finally {
       isSearching.value = false
+    }
+  }
+
+  function setScope(newScope) {
+    searchScope.value = newScope
+    if (query.value.trim()) {
+      executeSearch(query.value, newScope)
     }
   }
 
@@ -46,7 +102,7 @@ export function useSearch() {
     }
 
     debounceTimer = setTimeout(() => {
-      executeSearch(val)
+      executeSearch(val, searchScope.value)
     }, delay)
   }
 
@@ -65,6 +121,8 @@ export function useSearch() {
     results,
     isSearching,
     searchError,
+    searchScope,
+    setScope,
     executeSearch,
     handleInput,
     clearSearch

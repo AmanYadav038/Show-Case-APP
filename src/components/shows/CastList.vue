@@ -1,5 +1,7 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, getCurrentInstance } from 'vue'
+import { useDataSaver } from '../../composables/useDataSaver.js'
+import { useI18n } from '../../composables/useI18n.js'
 
 const props = defineProps({
   cast: {
@@ -8,14 +10,30 @@ const props = defineProps({
   }
 })
 
+const instance = getCurrentInstance()
+const { isDataSaverActive } = useDataSaver()
+const { t } = useI18n()
 const displayedCast = computed(() => props.cast.slice(0, 16))
+
+function goToActorShows(person) {
+  if (!person?.name) return
+  const router = instance?.appContext?.config?.globalProperties?.$router
+  if (router && typeof router.push === 'function') {
+    router.push({
+      name: 'search',
+      query: { q: person.name, personId: person.id }
+    })
+  } else if (typeof window !== 'undefined') {
+    window.location.hash = `#/search?q=${encodeURIComponent(person.name)}&personId=${person.id}`
+  }
+}
 </script>
 
 <template>
   <div v-if="displayedCast && displayedCast.length" class="cast-section">
     <div class="section-header">
       <div class="accent-bar"></div>
-      <h3 class="section-title">Top Cast</h3>
+      <h3 class="section-title">{{ t('showDetail.topCast') }}</h3>
       <span class="cast-count">({{ cast.length }})</span>
     </div>
 
@@ -24,10 +42,16 @@ const displayedCast = computed(() => props.cast.slice(0, 16))
         v-for="(item, index) in displayedCast"
         :key="index"
         class="cast-member-card"
+        role="button"
+        tabindex="0"
+        :title="`View shows starring ${item.person?.name}`"
+        :aria-label="`View shows starring ${item.person?.name}`"
+        @click="goToActorShows(item.person)"
+        @keydown.enter="goToActorShows(item.person)"
       >
         <div class="avatar-wrap">
           <img
-            v-if="item.person?.image?.medium"
+            v-if="!isDataSaverActive && item.person?.image?.medium"
             :src="item.person.image.medium"
             :alt="item.person.name"
             class="avatar-img"
@@ -104,12 +128,18 @@ const displayedCast = computed(() => props.cast.slice(0, 16))
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 1rem 0.75rem;
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
+  cursor: pointer;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .cast-member-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--border-light);
+  transform: translateY(-4px);
+  border-color: var(--primary);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.cast-member-card:hover .actor-name {
+  color: var(--primary);
 }
 
 .avatar-wrap {

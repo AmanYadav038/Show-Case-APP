@@ -2,6 +2,8 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWatchlist } from '../../composables/useWatchlist.js'
+import { useDataSaver } from '../../composables/useDataSaver.js'
+import { useI18n } from '../../composables/useI18n.js'
 import { stripHtml, formatYearRange, formatRuntime, getImageUrl } from '../../utils/formatters.js'
 import RatingBadge from '../common/RatingBadge.vue'
 
@@ -14,6 +16,8 @@ const props = defineProps({
 
 const router = useRouter()
 const { isInWatchlist, toggleWatchlist } = useWatchlist()
+const { getOptimizedImageUrl } = useDataSaver()
+const { t, translateGenre } = useI18n()
 
 const currentIndex = ref(0)
 let timer = null
@@ -25,7 +29,7 @@ const currentShow = computed(() => {
 
 const backdropUrl = computed(() => {
   if (!currentShow.value) return null
-  return getImageUrl(currentShow.value.image, 'original')
+  return getOptimizedImageUrl(currentShow.value.image, 'original', currentShow.value.name)
 })
 
 const yearText = computed(() => {
@@ -102,7 +106,7 @@ onUnmounted(() => {
       <!-- Spotlight Tag -->
       <div class="spotlight-tag">
         <span class="spotlight-pulse"></span>
-        <span>Featured Popular Show</span>
+        <span>{{ t('hero.spotlight') }}</span>
       </div>
 
       <!-- Title -->
@@ -129,7 +133,7 @@ onUnmounted(() => {
           :key="genre"
           class="hero-genre-pill"
         >
-          {{ genre }}
+          {{ translateGenre(genre) }}
         </span>
       </div>
 
@@ -144,7 +148,7 @@ onUnmounted(() => {
           <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z" />
           </svg>
-          <span>View Details</span>
+          <span>{{ t('hero.details') }}</span>
         </button>
 
         <button
@@ -155,7 +159,7 @@ onUnmounted(() => {
           <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
           </svg>
-          <span>{{ isBookmarked ? 'In Watchlist' : 'Add to Watchlist' }}</span>
+          <span>{{ isBookmarked ? t('hero.inWatchlist') : t('hero.addWatchlist') }}</span>
         </button>
       </div>
 

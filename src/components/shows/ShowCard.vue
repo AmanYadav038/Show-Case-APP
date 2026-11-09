@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useHoverPreview } from '../../composables/useHoverPreview.js'
 import { useWatchlist } from '../../composables/useWatchlist.js'
+import { useDataSaver } from '../../composables/useDataSaver.js'
+import { useI18n } from '../../composables/useI18n.js'
 import { formatYearRange, getImageUrl } from '../../utils/formatters.js'
 import RatingBadge from '../common/RatingBadge.vue'
 
@@ -24,8 +26,10 @@ const imageError = ref(false)
 
 const { showPreview, hidePreview } = useHoverPreview()
 const { isInWatchlist, toggleWatchlist } = useWatchlist()
+const { getOptimizedImageUrl } = useDataSaver()
+const { t, translateGenre } = useI18n()
 
-const posterUrl = computed(() => getImageUrl(props.show.image, 'medium'))
+const posterUrl = computed(() => getOptimizedImageUrl(props.show.image, 'medium', props.show.name))
 const yearText = computed(() => formatYearRange(props.show.premiered, props.show.ended))
 const primaryGenre = computed(() => props.show.genres?.[0] || null)
 const isBookmarked = computed(() => isInWatchlist(props.show.id))
@@ -84,7 +88,8 @@ function handleWatchlistClick(e) {
       <button 
         class="quick-watchlist-btn"
         :class="{ active: isBookmarked }"
-        :title="isBookmarked ? 'In Watchlist' : 'Add to Watchlist'"
+        :title="isBookmarked ? t('hero.inWatchlist') : t('hero.addWatchlist')"
+        :aria-label="isBookmarked ? t('hero.inWatchlist') : t('hero.addWatchlist')"
         @click="handleWatchlistClick"
       >
         <svg viewBox="0 0 24 24" fill="currentColor">
@@ -120,7 +125,7 @@ function handleWatchlistClick(e) {
     <div class="card-meta">
       <div class="meta-row">
         <span class="meta-year">{{ yearText }}</span>
-        <span v-if="primaryGenre" class="meta-genre">{{ primaryGenre }}</span>
+        <span v-if="primaryGenre" class="meta-genre">{{ translateGenre(primaryGenre) }}</span>
       </div>
       <h3 class="show-title" :title="show.name">
         {{ show.name }}

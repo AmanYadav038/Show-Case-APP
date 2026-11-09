@@ -4,6 +4,7 @@ const BASE_URL = 'https://api.tvmaze.com'
 const cache = {
   shows: null,
   showsPromise: null,
+  showPages: new Map(),
   showDetails: new Map(),
   searchResults: new Map()
 }
@@ -11,44 +12,36 @@ const cache = {
 /**
  * Fetch a list of shows from TVMaze index.
  * Caches the response in memory for snappy navigation.
- * @param {number} page - Page index (0 = first 250 shows)
+ * @param {number} page - Page index (0 = first 250 shows, 1 = next 250, etc.)
  * @returns {Promise<Array>}
  */
 export async function fetchShows(page = 0) {
-  if (cache.shows && page === 0) {
-    return cache.shows
-  }
-
-  if (cache.showsPromise && page === 0) {
-    return cache.showsPromise
-  }
-
-  const promise = (async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/shows?page=${page}`)
-      if (!response.ok) {
-        throw new Error(`TVMaze API error: ${response.status} ${response.statusText}`)
-      }
-      const data = await response.json()
-      if (page === 0) {
-        cache.shows = data
-      }
-      return data
-    } catch (error) {
-      console.error('Failed to fetch shows:', error)
-      throw error
-    } finally {
-      if (page === 0) {
-        cache.showsPromise = null
-      }
-    }
-  })()
-
+  // Only cache page 0 in memory for snappy navigation; subsequent pages for on-demand
+  // genre loads are fetched fresh and not cached globally
   if (page === 0) {
-    cache.showsPromise = promise
+    if (cache.shows) {
+      return cache.shows
+    }
+    if (cache.showPages.has(0)) {
+      return cache.showPages.get(0)
+    }
   }
 
-  return promise
+  try {
+    const response = await fetch(`${BASE_URL}/shows?page=${page}`)
+    if (!response.ok) {
+      throw new Error(`TVMaze API error: ${response.status} ${response.statusText}`)
+    }
+    const data = await response.json()
+    if (page === 0) {
+      cache.shows = data
+      cache.showPages.set(0, data)
+    }
+    return data
+  } catch (error) {
+    console.error('Failed to fetch shows:', error)
+    throw error
+  }
 }
 
 /**
@@ -113,11 +106,85 @@ export async function searchShows(query) {
 }
 
 /**
+ * Search people/actors by query string.
+ * @param {string} query
+ * @returns {Promise<Array>}
+ */
+export async function searchPeople(query) {
+  const trimmed = query.trim()
+  if (!trimmed) return []
+
+  const cacheKey = `people_${trimmed.toLowerCase()}`
+  if (cache.searchResults.has(cacheKey)) {
+    return cache.searchResults.get(cacheKey)
+  }
+
+  try {
+    const response = await fetch(`${BASE_URL}/search/people?q=${encodeURIComponent(trimmed)}`)
+    if (!response.ok) {
+      throw new Error(`TVMaze search error: ${response.status} ${response.statusText}`)
+    }
+    const data = await response.json()
+    const formatted = data.map(item => ({
+      ...item.person,
+      searchScore: item.score,
+      resultType: 'person'
+    }))
+    cache.searchResults.set(cacheKey, formatted)
+    return formatted
+  } catch (error) {
+    console.error(`Failed to search people for query "${query}":`, error)
+    throw error
+  }
+}
+
+/**
+ * Fetch cast credits for a person by their TVMaze person ID.
+ * Extracts embedded show objects so the UI can display shows starring the actor.
+ * @param {string|number} personId
+ * @returns {Promise<Array>} Array of show objects
+ */
+export async function fetchPersonCastCredits(personId) {
+  if (!personId) return []
+
+  const cacheKey = `person_credits_${personId}`
+  if (cache.searchResults.has(cacheKey)) {
+    return cache.searchResults.get(cacheKey)
+  }
+
+  try {
+    const response = await fetch(`${BASE_URL}/people/${personId}/castcredits?embed=show`)
+    if (!response.ok) {
+      throw new Error(`TVMaze person credits error: ${response.status} ${response.statusText}`)
+    }
+    const data = await response.json()
+    // Each item has _embedded.show
+    const showMap = new Map()
+    for (const credit of data) {
+      const show = credit?._embedded?.show
+      if (show && show.id && !showMap.has(show.id)) {
+        showMap.set(show.id, {
+          ...show,
+          characterName: credit?._links?.character?.name || null
+        })
+      }
+    }
+    const shows = Array.from(showMap.values())
+    cache.searchResults.set(cacheKey, shows)
+    return shows
+  } catch (error) {
+    console.error(`Failed to fetch cast credits for person ID ${personId}:`, error)
+    throw error
+  }
+}
+
+/**
  * Clear in-memory cache (useful for testing or manual refresh)
  */
 export function clearApiCache() {
   cache.shows = null
   cache.showsPromise = null
+  cache.showPages.clear()
   cache.showDetails.clear()
   cache.searchResults.clear()
 }

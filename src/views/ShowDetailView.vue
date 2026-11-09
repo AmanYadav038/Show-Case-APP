@@ -4,6 +4,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { fetchShowDetails } from '../services/tvmazeApi.js'
 import { useShows } from '../composables/useShows.js'
 import { useWatchlist } from '../composables/useWatchlist.js'
+import { useDataSaver } from '../composables/useDataSaver.js'
+import { useI18n } from '../composables/useI18n.js'
 import {
   stripHtml,
   formatRating,
@@ -31,6 +33,8 @@ const route = useRoute()
 const router = useRouter()
 const { shows, loadShows } = useShows()
 const { isInWatchlist, toggleWatchlist } = useWatchlist()
+const { getOptimizedImageUrl } = useDataSaver()
+const { t, translateGenre } = useI18n()
 
 const show = ref(null)
 const loading = ref(true)
@@ -41,11 +45,11 @@ const isBookmarked = computed(() => {
 })
 
 const posterUrl = computed(() => {
-  return getImageUrl(show.value?.image, 'original') || getImageUrl(show.value?.image, 'medium')
+  return getOptimizedImageUrl(show.value?.image, 'medium', show.value?.name)
 })
 
 const backdropUrl = computed(() => {
-  return getImageUrl(show.value?.image, 'original')
+  return getOptimizedImageUrl(show.value?.image, 'original', show.value?.name)
 })
 
 const yearText = computed(() => {
@@ -145,12 +149,12 @@ watch(() => props.id, () => {
     <template v-else-if="error">
       <div class="container error-wrap">
         <ErrorState
-          title="Show Not Found"
+          :title="t('showDetail.notFound')"
           :message="error"
           @retry="fetchDetails"
         />
         <button class="back-link-btn" @click="goBack">
-          ← Back to Dashboard
+          ← {{ t('showDetail.back') }}
         </button>
       </div>
     </template>
@@ -176,7 +180,7 @@ watch(() => props.id, () => {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="15 18 9 12 15 6" />
           </svg>
-          <span>Back to Dashboard</span>
+          <span>{{ t('showDetail.back') }}</span>
         </button>
 
         <!-- Hero Header Card -->
@@ -202,7 +206,7 @@ watch(() => props.id, () => {
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
               </svg>
-              <span>{{ isBookmarked ? 'In Watchlist' : 'Add to Watchlist' }}</span>
+              <span>{{ isBookmarked ? t('showDetail.inWatchlist') : t('showDetail.addWatchlist') }}</span>
             </button>
           </div>
 
@@ -234,34 +238,34 @@ watch(() => props.id, () => {
                 :key="genre"
                 class="genre-chip"
               >
-                {{ genre }}
+                {{ translateGenre(genre) }}
               </span>
             </div>
 
             <!-- Synopsis -->
             <div class="detail-synopsis-box">
-              <h3 class="synopsis-heading">Overview</h3>
+              <h3 class="synopsis-heading">{{ t('showDetail.synopsis') }}</h3>
               <p class="synopsis-paragraph">
-                {{ fullSummary }}
+                {{ fullSummary || t('showDetail.noSynopsis') }}
               </p>
             </div>
 
             <!-- Specification Grid -->
             <div class="specs-grid">
               <div v-if="networkText" class="spec-item">
-                <span class="spec-label">Network / Channel</span>
+                <span class="spec-label">{{ t('showDetail.network') }}</span>
                 <span class="spec-value">{{ networkText }}</span>
               </div>
               <div v-if="scheduleText" class="spec-item">
-                <span class="spec-label">Schedule</span>
+                <span class="spec-label">{{ t('showDetail.schedule') }}</span>
                 <span class="spec-value">{{ scheduleText }}</span>
               </div>
               <div v-if="show.language" class="spec-item">
-                <span class="spec-label">Language</span>
+                <span class="spec-label">{{ t('showDetail.language') }}</span>
                 <span class="spec-value">{{ show.language }}</span>
               </div>
               <div v-if="show.premiered" class="spec-item">
-                <span class="spec-label">Premiered Date</span>
+                <span class="spec-label">{{ t('showDetail.premiered') }}</span>
                 <span class="spec-value">{{ show.premiered }}</span>
               </div>
             </div>
@@ -275,7 +279,7 @@ watch(() => props.id, () => {
                 rel="noopener noreferrer"
                 class="external-site-btn"
               >
-                <span>Visit Official Site</span>
+                <span>{{ t('showDetail.officialSite') }}</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                   <polyline points="15 3 21 3 21 9" />
@@ -289,7 +293,7 @@ watch(() => props.id, () => {
                 rel="noopener noreferrer"
                 class="tvmaze-link-btn"
               >
-                <span>View on TVMaze</span>
+                <span>{{ t('showDetail.tvmaze') }}</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                   <polyline points="15 3 21 3 21 9" />
@@ -309,7 +313,7 @@ watch(() => props.id, () => {
         <!-- More Like This Row -->
         <div v-if="similarShows.length" class="similar-shows-row">
           <GenreRow
-            title="More Shows You Might Like"
+            :title="t('showDetail.moreLikeThis')"
             :shows="similarShows"
           />
         </div>

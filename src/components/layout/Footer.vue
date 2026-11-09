@@ -1,3 +1,8 @@
+<script setup>
+import { useI18n } from '../../composables/useI18n.js'
+const { t } = useI18n()
+</script>
+
 <template>
   <footer class="app-footer">
     <div class="footer-inner container">
@@ -12,17 +17,17 @@
             <span class="logo-text">Show<span class="text-gradient">Case</span></span>
           </div>
           <p class="brand-desc">
-            Your premier destination for exploring popular television series, ratings, and genre collections. Powered by the open TVMaze API.
+            {{ t('footer.tagline') }} {{ t('footer.attribution') }}
           </p>
         </div>
 
         <div class="footer-links-group">
           <h4 class="links-title">Features</h4>
           <ul class="links-list">
-            <li><router-link to="/">Dashboard</router-link></li>
-            <li><router-link to="/genre/Drama">Browse Genres</router-link></li>
-            <li><router-link to="/search">Search TV Shows</router-link></li>
-            <li><router-link to="/watchlist">My Watchlist</router-link></li>
+            <li><router-link to="/">{{ t('nav.discover') }}</router-link></li>
+            <li><router-link to="/genre/Drama">{{ t('nav.genres') }}</router-link></li>
+            <li><router-link to="/search">{{ t('search.title') }}</router-link></li>
+            <li><router-link to="/watchlist">{{ t('watchlist.title') }}</router-link></li>
           </ul>
         </div>
 
@@ -37,7 +42,7 @@
 
       <div class="footer-bottom">
         <p class="copyright">
-          © {{ new Date().getFullYear() }} ShowCase. Built with Vue 3 & Clean Frontend Architecture.
+          © {{ new Date().getFullYear() }} {{ t('footer.allRights') }}
         </p>
       </div>
     </div>

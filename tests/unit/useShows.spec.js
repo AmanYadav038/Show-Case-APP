@@ -100,4 +100,97 @@ describe('useShows composable', () => {
     expect(drama).toBeDefined()
     expect(drama.count).toBe(2)
   })
+
+  it('loadMoreShows fetches next page and appends to shows', async () => {
+    vi.spyOn(tvmazeApi, 'fetchShows')
+      .mockResolvedValueOnce(mockShowsData)
+      .mockResolvedValueOnce([
+        { id: 4, name: 'Show Page 2', rating: { average: 8.5 }, genres: ['Drama'] }
+      ])
+
+    const { loadShows, loadMoreShows, shows, currentPage, hasMore } = useShows()
+    await loadShows(true)
+    expect(shows.value.length).toBe(3)
+    expect(currentPage.value).toBe(0)
+
+    await loadMoreShows()
+    expect(shows.value.length).toBe(4)
+    expect(currentPage.value).toBe(1)
+    expect(shows.value[3].name).toBe('Show Page 2')
+    expect(hasMore.value).toBe(true) // Has more continues as catalog has subsequent pages
+  })
+
+  it('loadMoreShows sets hasMore to false when next page is empty', async () => {
+    vi.spyOn(tvmazeApi, 'fetchShows')
+      .mockResolvedValueOnce(mockShowsData)
+      .mockResolvedValueOnce([])
+
+    const { loadShows, loadMoreShows, hasMore } = useShows()
+    await loadShows(true)
+    expect(hasMore.value).toBe(true)
+
+    await loadMoreShows()
+    expect(hasMore.value).toBe(false)
+  })
+
+  it('loadMoreShowsForGenre can be called multiple times across consecutive pages without polluting global shows', async () => {
+    vi.spyOn(tvmazeApi, 'fetchShows')
+      .mockResolvedValueOnce(mockShowsData)
+      .mockResolvedValueOnce([
+        { id: 4, name: 'Action P1', rating: { average: 8.8 }, genres: ['Action'] }
+      ])
+      .mockResolvedValueOnce([
+        { id: 5, name: 'Action P2', rating: { average: 8.2 }, genres: ['Action'] }
+      ])
+
+    const { loadShows, loadMoreShowsForGenre, shows } = useShows()
+    await loadShows(true)
+    expect(shows.value.length).toBe(3) // Page 0 shows strictly
+
+    // First load: loads page 1
+    const res1 = await loadMoreShowsForGenre('Action', 1)
+    expect(res1.newShows.length).toBe(1)
+    expect(res1.lastPage).toBe(1)
+    expect(res1.hasMore).toBe(true)
+    expect(shows.value.length).toBe(3) // Untouched!
+
+    // Second load: loads page 2
+    const res2 = await loadMoreShowsForGenre('Action', 2)
+    expect(res2.newShows.length).toBe(1)
+    expect(res2.lastPage).toBe(2)
+    expect(res2.hasMore).toBe(true)
+    expect(shows.value.length).toBe(3) // Untouched!
+  })
+
+  it('loadMoreShowsForGenre extracts only matching genre shows and keeps global shows cache strictly on page 0', async () => {
+    vi.spyOn(tvmazeApi, 'fetchShows')
+      .mockResolvedValueOnce(mockShowsData)
+      .mockResolvedValueOnce([
+        { id: 4, name: 'Show Action Next', rating: { average: 8.8 }, genres: ['Action', 'Thriller'] },
+        { id: 5, name: 'Show Comedy Next', rating: { average: 7.2 }, genres: ['Comedy'] }
+      ])
+
+    const { loadShows, loadMoreShowsForGenre, shows } = useShows()
+    await loadShows(true)
+    expect(shows.value.length).toBe(3)
+
+    const { newShows } = await loadMoreShowsForGenre('Action', 1)
+    expect(newShows.length).toBe(1)
+    expect(newShows[0].name).toBe('Show Action Next')
+    // Global shows.value is NOT contaminated with other genre shows
+    expect(shows.value.length).toBe(3)
+  })
+
+  it('loadMoreShowsForGenre handles 404 end-of-catalog gracefully', async () => {
+    vi.spyOn(tvmazeApi, 'fetchShows')
+      .mockResolvedValueOnce(mockShowsData)
+      .mockRejectedValueOnce(new Error('TVMaze API error: 404 Not Found'))
+
+    const { loadShows, loadMoreShowsForGenre } = useShows()
+    await loadShows(true)
+
+    const res = await loadMoreShowsForGenre('Action', 1)
+    expect(res.newShows.length).toBe(0)
+    expect(res.hasMore).toBe(false)
+  })
 })

@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useShows, CURATED_GENRES } from '../composables/useShows.js'
+import { useI18n } from '../composables/useI18n.js'
 import ShowCard from '../components/shows/ShowCard.vue'
 import LoadingSkeleton from '../components/common/LoadingSkeleton.vue'
 import ErrorState from '../components/common/ErrorState.vue'
@@ -15,10 +16,74 @@ const props = defineProps({
 
 const route = useRoute()
 const router = useRouter()
-const { shows, loading, error, isLoaded, loadShows } = useShows()
+const {
+  shows,
+  loading,
+  error,
+  isLoaded,
+  loadShows,
+  loadMoreShowsForGenre,
+  isLoadingMore,
+  loadMoreError
+} = useShows()
+
+const { t, translateGenre } = useI18n()
 
 const currentGenre = ref(props.genre || 'Drama')
 const sortBy = ref('rating') // 'rating' | 'popularity' | 'year' | 'name'
+
+// Extra shows loaded on-demand specifically for the active genre view (not cached globally)
+const extraShows = ref([])
+const currentGenrePage = ref(0)
+const hasMoreGenre = ref(true)
+const loadMoreMessage = ref('')
+let feedbackTimer = null
+
+// Reset genre-specific extra shows and pagination when switching genre
+function resetGenreExtra() {
+  extraShows.value = []
+  currentGenrePage.value = 0
+  hasMoreGenre.value = true
+  loadMoreMessage.value = ''
+  if (feedbackTimer) clearTimeout(feedbackTimer)
+}
+
+async function handleLoadMore() {
+  if (isLoadingMore.value || !hasMoreGenre.value) return
+  if (feedbackTimer) clearTimeout(feedbackTimer)
+
+  const existingIds = new Set(genreShows.value.map(s => s.id))
+  const nextPageToFetch = currentGenrePage.value + 1
+
+  const { newShows, lastPage, hasMore } = await loadMoreShowsForGenre(
+    currentGenre.value,
+    nextPageToFetch,
+    existingIds
+  )
+
+  currentGenrePage.value = lastPage
+  hasMoreGenre.value = hasMore
+
+  if (newShows && newShows.length > 0) {
+    extraShows.value = [...extraShows.value, ...newShows]
+    loadMoreMessage.value = t('genreView.loadedMoreToast', {
+      count: newShows.length,
+      genre: translateGenre(currentGenre.value)
+    })
+    feedbackTimer = setTimeout(() => {
+      loadMoreMessage.value = ''
+    }, 4000)
+  } else if (!hasMore) {
+    loadMoreMessage.value = t('genreView.allLoaded', {
+      genre: translateGenre(currentGenre.value)
+    })
+  } else {
+    loadMoreMessage.value = `Checked next catalog batch; no new ${translateGenre(currentGenre.value)} shows in that slice. Click again to search deeper.`
+    feedbackTimer = setTimeout(() => {
+      loadMoreMessage.value = ''
+    }, 5000)
+  }
+}
 
 // All available genre choices including 'Top-Rated'
 const allGenres = computed(() => {
@@ -28,17 +93,25 @@ const allGenres = computed(() => {
 // Normalize genre name for display and filtering
 const displayTitle = computed(() => {
   if (currentGenre.value.toLowerCase() === 'top-rated') {
-    return 'Top Rated TV Shows'
+    return t('genreView.topRatedTitle')
   }
-  return `${currentGenre.value} TV Shows`
+  return t('genreView.title', { genre: translateGenre(currentGenre.value) })
+})
+
+const genreDescription = computed(() => {
+  if (currentGenre.value.toLowerCase() === 'top-rated') {
+    return t('genreView.topRatedDesc')
+  }
+  return t('genreView.desc', { genre: translateGenre(currentGenre.value) })
 })
 
 const genreShows = computed(() => {
-  if (!shows.value.length) return []
+  if (!shows.value.length && !extraShows.value.length) return []
 
   const g = currentGenre.value.toLowerCase()
   let list = []
 
+  // 1. Base shows strictly from Page 0 (cached in shows.value)
   if (g === 'top-rated') {
     list = shows.value.filter(s => s.rating?.average >= 7.8)
   } else {
@@ -47,7 +120,14 @@ const genreShows = computed(() => {
     )
   }
 
-  // Sort
+  // 2. Combine with extra shows loaded specifically for THIS genre view
+  if (extraShows.value.length > 0) {
+    const existingIds = new Set(list.map(s => s.id))
+    const uniqueExtras = extraShows.value.filter(s => !existingIds.has(s.id))
+    list = [...list, ...uniqueExtras]
+  }
+
+  // 3. Sort
   return [...list].sort((a, b) => {
     if (sortBy.value === 'rating') {
       const rA = a.rating?.average ?? 0
@@ -72,6 +152,7 @@ const genreShows = computed(() => {
 
 function changeGenre(newGenre) {
   currentGenre.value = newGenre
+  resetGenreExtra()
   router.push({ name: 'genre-detail', params: { genre: newGenre } })
 }
 
@@ -85,6 +166,7 @@ onMounted(() => {
 watch(() => props.genre, (newVal) => {
   if (newVal) {
     currentGenre.value = newVal
+    resetGenreExtra()
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 })
@@ -98,17 +180,17 @@ watch(() => props.genre, (newVal) => {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        <span>Back to Dashboard</span>
+        <span>{{ t('genreView.back') }}</span>
       </router-link>
     </div>
 
     <!-- Genre Banner & Controls -->
     <div class="genre-hero-card">
       <div class="hero-left">
-        <span class="genre-tag">Genre Spotlight</span>
+        <span class="genre-tag">{{ t('genreView.spotlight') }}</span>
         <h1 class="genre-main-title">{{ displayTitle }}</h1>
         <p class="genre-desc">
-          Browse the highest-rated and most popular {{ currentGenre }} series curated from TVMaze.
+          {{ genreDescription }}
         </p>
       </div>
 
@@ -116,7 +198,7 @@ watch(() => props.genre, (newVal) => {
       <div class="hero-controls">
         <!-- Genre Switcher Dropdown -->
         <div class="control-box">
-          <label for="genre-select" class="control-label">Switch Genre:</label>
+          <label for="genre-select" class="control-label">{{ t('genreView.switchGenre') }}</label>
           <div class="select-wrapper">
             <select
               id="genre-select"
@@ -129,7 +211,7 @@ watch(() => props.genre, (newVal) => {
                 :key="g"
                 :value="g"
               >
-                {{ g === 'Top-Rated' ? '⭐ Top-Rated' : g }}
+                {{ g === 'Top-Rated' ? '⭐ ' + t('nav.topRated') : translateGenre(g) }}
               </option>
             </select>
             <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -140,17 +222,17 @@ watch(() => props.genre, (newVal) => {
 
         <!-- Sort By Dropdown -->
         <div class="control-box">
-          <label for="sort-select" class="control-label">Sort By:</label>
+          <label for="sort-select" class="control-label">{{ t('genreView.sortBy') }}</label>
           <div class="select-wrapper">
             <select
               id="sort-select"
               v-model="sortBy"
               class="styled-select"
             >
-              <option value="rating">Rating (Highest first)</option>
-              <option value="popularity">Popularity / Weight</option>
-              <option value="year">Release Year (Newest)</option>
-              <option value="name">Title (A–Z)</option>
+              <option value="rating">{{ t('genreView.sortRating') }}</option>
+              <option value="popularity">{{ t('genreView.sortPopularity') }}</option>
+              <option value="year">{{ t('genreView.sortYear') }}</option>
+              <option value="name">{{ t('genreView.sortName') }}</option>
             </select>
             <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="6 9 12 15 18 9" />
@@ -163,7 +245,7 @@ watch(() => props.genre, (newVal) => {
     <!-- Active Count Indicator -->
     <div class="genre-status-bar">
       <span class="count-pill">
-        Showing <strong>{{ genreShows.length }}</strong> TV shows
+        {{ t('genreView.showingCount', { count: genreShows.length }) }}
       </span>
     </div>
 
@@ -175,28 +257,89 @@ watch(() => props.genre, (newVal) => {
     <!-- Error State -->
     <template v-else-if="error">
       <ErrorState
-        title="Failed to Load Shows"
+        :title="t('dashboard.emptyTitle')"
         :message="error"
         @retry="loadShows(true)"
       />
     </template>
 
     <!-- Results Grid -->
-    <div v-else-if="genreShows.length > 0" class="grid-cards fade-in">
-      <ShowCard
-        v-for="(show, index) in genreShows"
-        :key="show.id"
-        :show="show"
-        :show-rank="currentGenre.toLowerCase() === 'top-rated' ? index + 1 : null"
-      />
-    </div>
+    <template v-else-if="genreShows.length > 0">
+      <div class="grid-cards fade-in">
+        <ShowCard
+          v-for="(show, index) in genreShows"
+          :key="show.id"
+          :show="show"
+          :show-rank="currentGenre.toLowerCase() === 'top-rated' ? index + 1 : null"
+        />
+      </div>
+
+      <!-- Load More Section for Genre -->
+      <div class="genre-load-more-section">
+        <!-- Transient Feedback Toast -->
+        <transition name="fade">
+          <div v-if="loadMoreMessage" class="load-more-toast">
+            {{ loadMoreMessage }}
+          </div>
+        </transition>
+
+        <!-- Inline Error if fetch failed -->
+        <div v-if="loadMoreError" class="load-more-error-box">
+          <span class="error-msg">{{ loadMoreError }}</span>
+          <button class="retry-inline-btn" @click="handleLoadMore">
+            {{ t('dashboard.retry') }}
+          </button>
+        </div>
+
+        <!-- Action Button / Complete State -->
+        <div class="load-more-actions">
+          <button
+            v-if="hasMoreGenre"
+            class="genre-load-more-btn"
+            :disabled="isLoadingMore"
+            @click="handleLoadMore"
+          >
+            <span v-if="isLoadingMore" class="btn-spinner" aria-hidden="true"></span>
+            <span class="btn-label">
+              {{ isLoadingMore ? t('genreView.loadingMore', { genre: translateGenre(currentGenre) }) : t('genreView.loadMore', { genre: translateGenre(currentGenre) }) }}
+            </span>
+            <svg v-if="!isLoadingMore" class="btn-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          <div v-else class="catalog-complete-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="complete-icon">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>{{ t('genreView.allLoaded', { genre: translateGenre(currentGenre) }) }}</span>
+          </div>
+        </div>
+
+        <!-- Metadata text -->
+        <p class="catalog-meta-info">
+          {{ currentGenrePage > 0 ? t('genreView.pageSubtextLoaded', { count: genreShows.length, genre: translateGenre(currentGenre), extra: extraShows.length, page: currentGenrePage }) : t('genreView.pageSubtextInitial', { count: genreShows.length, genre: translateGenre(currentGenre) }) }}
+        </p>
+      </div>
+    </template>
 
     <!-- Empty State -->
     <div v-else class="empty-genre-box">
-      <p>No shows currently listed under "{{ currentGenre }}".</p>
-      <button class="reset-btn" @click="changeGenre('Drama')">
-        View Drama Shows
-      </button>
+      <p>{{ t('genreView.empty', { genre: translateGenre(currentGenre) }) }}</p>
+      <div class="empty-actions">
+        <button
+          v-if="hasMoreGenre"
+          class="genre-load-more-btn"
+          :disabled="isLoadingMore"
+          @click="handleLoadMore"
+        >
+          <span v-if="isLoadingMore" class="btn-spinner" aria-hidden="true"></span>
+          <span>{{ t('genreView.fetchNextPages', { genre: translateGenre(currentGenre) }) }}</span>
+        </button>
+        <button class="reset-btn" @click="changeGenre('Drama')">
+          {{ t('genreView.viewDrama') }}
+        </button>
+      </div>
     </div>
   </main>
 </template>
@@ -386,5 +529,165 @@ watch(() => props.genre, (newVal) => {
   color: #fff;
   font-weight: 700;
   border-radius: var(--radius-md);
+}
+
+/* Load More Section Styles */
+.genre-load-more-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3.5rem;
+  padding: 1.5rem 0;
+  gap: 1.15rem;
+}
+
+.load-more-toast {
+  background: rgba(22, 33, 27, 0.95);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  padding: 0.55rem 1.4rem;
+  border-radius: var(--radius-full);
+  font-size: 0.88rem;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.load-more-error-box {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+}
+
+.retry-inline-btn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.retry-inline-btn:hover {
+  opacity: 0.85;
+}
+
+.load-more-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.genre-load-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: var(--accent-gradient);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.85rem 2.25rem;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(230, 57, 70, 0.35);
+  transition: all var(--transition-normal);
+}
+
+.genre-load-more-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(230, 57, 70, 0.5);
+}
+
+.genre-load-more-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.genre-load-more-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-arrow-down {
+  width: 17px;
+  height: 17px;
+  transition: transform var(--transition-fast);
+}
+
+.genre-load-more-btn:hover:not(:disabled) .btn-arrow-down {
+  transform: translateY(2px);
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.catalog-complete-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.complete-icon {
+  width: 16px;
+  height: 16px;
+  color: #4ade80;
+}
+
+.catalog-meta-info {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.catalog-meta-info strong {
+  color: var(--text-secondary);
+}
+
+.empty-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

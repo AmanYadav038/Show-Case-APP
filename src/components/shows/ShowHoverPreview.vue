@@ -3,6 +3,8 @@ import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useHoverPreview } from '../../composables/useHoverPreview.js'
 import { useWatchlist } from '../../composables/useWatchlist.js'
+import { useDataSaver } from '../../composables/useDataSaver.js'
+import { useI18n } from '../../composables/useI18n.js'
 import { stripHtml, formatYearRange, formatRuntime, getImageUrl } from '../../utils/formatters.js'
 import RatingBadge from '../common/RatingBadge.vue'
 
@@ -10,6 +12,8 @@ const router = useRouter()
 const route = useRoute()
 const { activeShow, anchorRect, isVisible, hidePreview, keepPreviewOpen } = useHoverPreview()
 const { isInWatchlist, toggleWatchlist } = useWatchlist()
+const { getOptimizedImageUrl } = useDataSaver()
+const { t, translateGenre } = useI18n()
 
 const cardRef = ref(null)
 
@@ -82,7 +86,7 @@ const synopsis = computed(() => {
 })
 
 const posterSrc = computed(() => {
-  return getImageUrl(activeShow.value?.image, 'medium')
+  return getOptimizedImageUrl(activeShow.value?.image, 'medium', activeShow.value?.name)
 })
 
 const yearText = computed(() => {
@@ -164,7 +168,7 @@ function handleWatchlistToggle() {
             :key="genre" 
             class="genre-pill"
           >
-            {{ genre }}
+            {{ translateGenre(genre) }}
           </span>
         </div>
 
@@ -176,7 +180,7 @@ function handleWatchlistToggle() {
         <!-- Actions -->
         <div class="popover-actions">
           <button class="action-btn-primary" @click="goToDetail">
-            <span>View Details</span>
+            <span>{{ t('hero.details') }}</span>
             <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M5 12h14" />
               <path d="M12 5l7 7-7 7" />
@@ -186,7 +190,7 @@ function handleWatchlistToggle() {
           <button 
             class="action-btn-icon" 
             :class="{ active: isBookmarked }"
-            :title="isBookmarked ? 'Remove from Watchlist' : 'Add to Watchlist'"
+            :title="isBookmarked ? t('hero.inWatchlist') : t('hero.addWatchlist')"
             @click.stop="handleWatchlistToggle"
           >
             <svg viewBox="0 0 24 24" fill="currentColor">

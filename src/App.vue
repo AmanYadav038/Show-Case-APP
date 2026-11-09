@@ -2,6 +2,7 @@
 import Navbar from './components/layout/Navbar.vue'
 import Footer from './components/layout/Footer.vue'
 import ShowHoverPreview from './components/shows/ShowHoverPreview.vue'
+import DataSaverFab from './components/common/DataSaverFab.vue'
 </script>
 
 <template>
@@ -20,6 +21,9 @@ import ShowHoverPreview from './components/shows/ShowHoverPreview.vue'
 
     <!-- Floating Hover Preview Card (Teleported singleton) -->
     <ShowHoverPreview />
+
+    <!-- Floating Action Button for Data Saver / Image Optimization -->
+    <DataSaverFab />
 
     <!-- Site Footer -->
     <Footer />

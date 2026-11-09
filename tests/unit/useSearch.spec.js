@@ -6,6 +6,7 @@ describe('useSearch composable', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.restoreAllMocks()
+    vi.spyOn(tvmazeApi, 'searchPeople').mockResolvedValue([])
   })
 
   it('initializes with empty query and results', () => {
@@ -58,5 +59,33 @@ describe('useSearch composable', () => {
     expect(results.value).toEqual([])
     expect(isSearching.value).toBe(false)
     expect(searchError.value).toBe(null)
+  })
+
+  it('executeSearch with scope actors searches people via searchPeople', async () => {
+    const mockPeople = [{ id: 1, name: 'Bryan Cranston' }]
+    vi.spyOn(tvmazeApi, 'searchPeople').mockResolvedValueOnce(mockPeople)
+
+    const { executeSearch, results, searchScope } = useSearch()
+    searchScope.value = 'actors'
+    const data = await executeSearch('Bryan Cranston', 'actors')
+
+    expect(data.length).toBe(1)
+    expect(data[0].name).toBe('Bryan Cranston')
+    expect(data[0].resultType).toBe('person')
+    expect(results.value).toEqual(data)
+  })
+
+  it('executeSearch with scope all includes both matching actors and shows', async () => {
+    const mockShows = [{ id: 101, name: 'Breaking Bad' }]
+    const mockPeople = [{ id: 1, name: 'Bryan Cranston' }]
+    vi.spyOn(tvmazeApi, 'searchShows').mockResolvedValueOnce(mockShows)
+    vi.spyOn(tvmazeApi, 'searchPeople').mockResolvedValueOnce(mockPeople)
+
+    const { executeSearch, results } = useSearch()
+    const data = await executeSearch('Bryan', 'all')
+
+    expect(data.some(item => item.resultType === 'person' && item.name === 'Bryan Cranston')).toBe(true)
+    expect(data.some(item => item.name === 'Breaking Bad')).toBe(true)
+    expect(results.value).toEqual(data)
   })
 })

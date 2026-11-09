@@ -38,12 +38,12 @@ onMounted(() => {
       />
     </template>
 
-    <!-- Main Content -->
+    <!-- Main Content with Genre Rows (10 shows per row) -->
     <template v-else>
       <!-- Hero Spotlight Banner -->
       <HeroBanner :shows="featuredShows" />
 
-      <!-- Section: Popular / Top Rated (Across all genres) -->
+      <!-- Section: Popular / Top Rated (Top 10 Ranked Shows) -->
       <div id="genre-top-rated">
         <GenreRow
           title="Top Rated TV Shows"
@@ -53,13 +53,13 @@ onMounted(() => {
         />
       </div>
 
-      <!-- Genre-based Horizontal Rows with "View All" -->
+      <!-- Genre-based Horizontal Rows (10 shows per genre with "View All") -->
       <GenreRow
         v-for="(shows, genreName) in genreLists"
         :key="genreName"
         :title="`${genreName} Shows`"
         :genre-key="genreName"
-        :shows="shows"
+        :shows="shows.slice(0, 10)"
       />
     </template>
   </main>
@@ -68,6 +68,6 @@ onMounted(() => {
 <style scoped>
 .dashboard-page {
   padding-top: 1.5rem;
-  padding-bottom: 3rem;
+  padding-bottom: 3.5rem;
 }
 </style>

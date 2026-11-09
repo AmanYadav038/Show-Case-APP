@@ -2,16 +2,33 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSearch } from '../../composables/useSearch.js'
+import { useI18n } from '../../composables/useI18n.js'
 import { formatYearRange, getImageUrl } from '../../utils/formatters.js'
 import RatingBadge from '../common/RatingBadge.vue'
 
+// Import icons as static SVG assets from assets folder
+import searchIcon from '@/assets/icons/search.svg'
+import closeIcon from '@/assets/icons/close.svg'
+import arrowRightIcon from '@/assets/icons/arrow-right.svg'
+import tvIcon from '@/assets/icons/tv.svg'
+import actorIcon from '@/assets/icons/actor.svg'
+import genreIcon from '@/assets/icons/genre.svg'
+
 const router = useRouter()
-const { query, results, isSearching, handleInput, clearSearch } = useSearch()
+const { query, results, isSearching, searchScope, setScope, handleInput, clearSearch } = useSearch()
+const { t } = useI18n()
 
 const isDropdownOpen = ref(false)
 const searchContainer = ref(null)
 
-const displayedResults = computed(() => results.value.slice(0, 7))
+const scopes = computed(() => [
+  { id: 'all', label: t('search.all'), icon: searchIcon },
+  { id: 'shows', label: t('search.shows'), icon: tvIcon },
+  { id: 'actors', label: t('search.people'), icon: actorIcon },
+  { id: 'genres', label: t('search.genres'), icon: genreIcon }
+])
+
+const displayedResults = computed(() => results.value.slice(0, 8))
 
 function onInput(event) {
   const val = event.target.value
@@ -25,10 +42,25 @@ function onFocus() {
   }
 }
 
-function selectShow(show) {
+function selectResult(item) {
   isDropdownOpen.value = false
   clearSearch()
-  router.push({ name: 'show-detail', params: { id: show.id } })
+
+  if (item.resultType === 'person') {
+    // Navigate to search results with actor's name and actor ID
+    router.push({ name: 'search', query: { q: item.name, personId: item.id } })
+  } else if (item.resultType === 'genre') {
+    // Navigate directly to genre collection view
+    router.push({ name: 'genre-detail', params: { genre: item.genreName } })
+  } else {
+    // Navigate to show details
+    router.push({ name: 'show-detail', params: { id: item.id } })
+  }
+}
+
+// Retain alias for test compatibility
+function selectShow(show) {
+  selectResult(show)
 }
 
 function submitSearch() {
@@ -57,6 +89,7 @@ onUnmounted(() => {
 <template>
   <div ref="searchContainer" class="search-bar-wrapper">
     <div class="search-input-box" :class="{ 'focused': isDropdownOpen }">
+      <!-- Search button using <img> tag -->
       <button
         type="button"
         class="search-icon-btn"
@@ -64,16 +97,13 @@ onUnmounted(() => {
         title="Search"
         @click="submitSearch"
       >
-        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
+        <img :src="searchIcon" class="search-icon" alt="Search icon" />
       </button>
 
       <input
         type="search"
         :value="query"
-        placeholder="Search TV shows, series, genres..."
+        :placeholder="t('nav.searchPlaceholder')"
         class="search-input"
         autocomplete="off"
         aria-label="Search shows"
@@ -84,7 +114,7 @@ onUnmounted(() => {
       <!-- Spinner indicator -->
       <div v-if="isSearching" class="search-spinner" aria-label="Searching..."></div>
 
-      <!-- Clear button -->
+      <!-- Clear button using <img> tag -->
       <button
         v-else-if="query"
         type="button"
@@ -92,61 +122,106 @@ onUnmounted(() => {
         aria-label="Clear search"
         @click="clearSearch"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
+        <img :src="closeIcon" class="clear-icon" alt="Clear icon" />
       </button>
     </div>
 
-    <!-- Live Suggestions Dropdown -->
+    <!-- Live Suggestions & Granular Search Dropdown -->
     <div v-if="isDropdownOpen && query.trim()" class="search-dropdown fade-in">
+      <!-- Granular Category Filter Tabs -->
+      <div class="search-scope-tabs" role="tablist" aria-label="Search Categories">
+        <button
+          v-for="s in scopes"
+          :key="s.id"
+          type="button"
+          class="scope-tab-btn"
+          :class="{ active: searchScope === s.id }"
+          @click.stop="setScope(s.id)"
+        >
+          <img :src="s.icon" class="scope-tab-icon" :alt="s.label" />
+          <span>{{ s.label }}</span>
+        </button>
+      </div>
+
       <!-- Loading indicator text -->
       <div v-if="isSearching && !displayedResults.length" class="dropdown-status">
-        Searching TVMaze database...
+        Searching TVMaze database for {{ searchScope }}...
       </div>
 
       <!-- No results notice -->
       <div v-else-if="!isSearching && !displayedResults.length" class="dropdown-status">
-        No TV shows found for "<span class="query-highlight">{{ query }}</span>"
+        No results found for "<span class="query-highlight">{{ query }}</span>" in {{ searchScope }}.
       </div>
 
       <!-- Results list -->
       <ul v-else class="results-list" role="listbox">
         <li
-          v-for="show in displayedResults"
-          :key="show.id"
+          v-for="item in displayedResults"
+          :key="item.id"
           class="result-item"
           role="option"
-          @click="selectShow(show)"
+          @click="selectResult(item)"
         >
-          <!-- Thumbnail -->
-          <div class="result-thumb-wrapper">
-            <img
-              v-if="getImageUrl(show.image, 'medium')"
-              :src="getImageUrl(show.image, 'medium')"
-              :alt="show.name"
-              class="result-thumb"
-            />
-            <div v-else class="result-thumb-fallback">📺</div>
-          </div>
-
-          <!-- Info -->
-          <div class="result-info">
-            <div class="result-title">{{ show.name }}</div>
-            <div class="result-meta">
-              <RatingBadge :rating="show.rating" size="sm" />
-              <span class="meta-dot">•</span>
-              <span class="meta-year">{{ formatYearRange(show.premiered, show.ended) }}</span>
-              <span v-if="show.genres && show.genres[0]" class="meta-dot">•</span>
-              <span v-if="show.genres && show.genres[0]" class="meta-genre">{{ show.genres[0] }}</span>
+          <!-- Genre Item -->
+          <template v-if="item.resultType === 'genre'">
+            <div class="result-thumb-wrapper genre-thumb">
+              <img :src="genreIcon" class="genre-icon-img" alt="Genre" />
             </div>
-          </div>
+            <div class="result-info">
+              <div class="result-title">{{ item.name }}</div>
+              <div class="result-meta">
+                <span class="category-chip genre-chip">Genre Collection</span>
+              </div>
+            </div>
+          </template>
 
-          <!-- Arrow indicator -->
-          <svg class="result-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
+          <!-- Actor / Person Item -->
+          <template v-else-if="item.resultType === 'person'">
+            <div class="result-thumb-wrapper person-thumb">
+              <img
+                v-if="getImageUrl(item.image, 'medium')"
+                :src="getImageUrl(item.image, 'medium')"
+                :alt="item.name"
+                class="result-thumb"
+              />
+              <div v-else class="result-thumb-fallback">👤</div>
+            </div>
+            <div class="result-info">
+              <div class="result-title">{{ item.name }}</div>
+              <div class="result-meta">
+                <span class="category-chip actor-chip">Actor / Cast</span>
+                <span v-if="item.country?.name" class="meta-dot">•</span>
+                <span v-if="item.country?.name" class="meta-country">{{ item.country.name }}</span>
+              </div>
+            </div>
+          </template>
+
+          <!-- Standard TV Show Item -->
+          <template v-else>
+            <div class="result-thumb-wrapper">
+              <img
+                v-if="getImageUrl(item.image, 'medium')"
+                :src="getImageUrl(item.image, 'medium')"
+                :alt="item.name"
+                class="result-thumb"
+              />
+              <div v-else class="result-thumb-fallback">📺</div>
+            </div>
+
+            <div class="result-info">
+              <div class="result-title">{{ item.name }}</div>
+              <div class="result-meta">
+                <RatingBadge :rating="item.rating" size="sm" />
+                <span class="meta-dot">•</span>
+                <span class="meta-year">{{ formatYearRange(item.premiered, item.ended) }}</span>
+                <span v-if="item.genres && item.genres[0]" class="meta-dot">•</span>
+                <span v-if="item.genres && item.genres[0]" class="meta-genre">{{ item.genres[0] }}</span>
+              </div>
+            </div>
+          </template>
+
+          <!-- Arrow indicator using <img> tag -->
+          <img :src="arrowRightIcon" class="result-arrow" alt="Go" />
         </li>
       </ul>
 
@@ -154,10 +229,7 @@ onUnmounted(() => {
       <div v-if="displayedResults.length" class="dropdown-footer">
         <button class="see-all-btn" @click="submitSearch">
           <span>See all results for "<strong>{{ query }}</strong>"</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>
+          <img :src="arrowRightIcon" class="footer-arrow-icon" alt="View all" />
         </button>
       </div>
     </div>
@@ -195,23 +267,13 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--text-muted);
   margin-right: 0.55rem;
-  transition: color var(--transition-fast);
-}
-
-.search-icon-btn:hover {
-  color: var(--primary);
 }
 
 .search-icon {
   width: 18px;
   height: 18px;
-  flex-shrink: 0;
-}
-
-.search-input-box:focus-within .search-icon-btn {
-  color: var(--primary);
+  display: block;
 }
 
 .search-input {
@@ -228,7 +290,6 @@ onUnmounted(() => {
   color: var(--text-muted);
 }
 
-/* Remove default webkit search cancel button */
 .search-input::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
@@ -252,18 +313,17 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
   border-radius: 50%;
-  transition: color var(--transition-fast);
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
-.clear-btn:hover {
-  color: var(--text-primary);
-}
-
-.clear-btn svg {
+.clear-icon {
   width: 14px;
   height: 14px;
+  display: block;
 }
 
 /* Dropdown */
@@ -279,6 +339,49 @@ onUnmounted(() => {
   overflow: hidden;
   z-index: 1000;
   backdrop-filter: blur(20px);
+}
+
+/* Category Scope Selector Tabs */
+.search-scope-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.75rem;
+  background: rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.scope-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.scope-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.scope-tab-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(230, 57, 70, 0.4);
+}
+
+.scope-tab-icon {
+  width: 13px;
+  height: 13px;
+  display: block;
 }
 
 .dropdown-status {
@@ -327,6 +430,25 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
+.genre-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.genre-icon-img {
+  width: 24px;
+  height: 24px;
+}
+
+.person-thumb {
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+}
+
 .result-thumb {
   width: 100%;
   height: 100%;
@@ -373,25 +495,45 @@ onUnmounted(() => {
   color: var(--text-secondary);
 }
 
+.category-chip {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.actor-chip {
+  background: rgba(244, 166, 166, 0.16);
+  color: var(--accent);
+  border: 1px solid rgba(244, 166, 166, 0.3);
+}
+
+.genre-chip {
+  background: rgba(251, 191, 36, 0.16);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
 .meta-dot {
   color: var(--text-muted);
 }
 
-.meta-year, .meta-genre {
+.meta-year, .meta-genre, .meta-country {
   font-weight: 500;
 }
 
 .result-arrow {
   width: 16px;
   height: 16px;
-  color: var(--text-muted);
   flex-shrink: 0;
-  transition: transform var(--transition-fast), color var(--transition-fast);
+  transition: transform var(--transition-fast);
 }
 
 .result-item:hover .result-arrow,
 .result-item.active .result-arrow {
-  color: var(--primary);
   transform: translateX(3px);
 }
 
@@ -410,6 +552,9 @@ onUnmounted(() => {
   font-size: 0.85rem;
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
@@ -418,7 +563,7 @@ onUnmounted(() => {
   color: #fff;
 }
 
-.see-all-btn svg {
+.footer-arrow-icon {
   width: 15px;
   height: 15px;
 }
