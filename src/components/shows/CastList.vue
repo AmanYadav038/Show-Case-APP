@@ -1,7 +1,7 @@
 <script setup>
 import { computed, getCurrentInstance } from 'vue'
-import { useDataSaver } from '../../composables/useDataSaver.js'
 import { useI18n } from '../../composables/useI18n.js'
+import { useDataSaver } from '../../composables/useDataSaver.js'
 
 const props = defineProps({
   cast: {
@@ -11,8 +11,8 @@ const props = defineProps({
 })
 
 const instance = getCurrentInstance()
-const { isDataSaverActive } = useDataSaver()
 const { t } = useI18n()
+const { effectiveDataSaverActive, getOptimizedImageUrl } = useDataSaver()
 const displayedCast = computed(() => props.cast.slice(0, 16))
 
 function goToActorShows(person) {
@@ -51,8 +51,8 @@ function goToActorShows(person) {
       >
         <div class="avatar-wrap">
           <img
-            v-if="!isDataSaverActive && item.person?.image?.medium"
-            :src="item.person.image.medium"
+            v-if="effectiveDataSaverActive || item.person?.image?.medium"
+            :src="getOptimizedImageUrl(item.person?.image, 'medium', item.person?.name)"
             :alt="item.person.name"
             class="avatar-img"
             loading="lazy"
@@ -156,6 +156,13 @@ function goToActorShows(person) {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.avatar-img[src*="play"],
+.avatar-img[src*="placeholder"] {
+  object-fit: contain;
+  padding: 0.6rem;
+  background: #241c1d;
 }
 
 .avatar-fallback {

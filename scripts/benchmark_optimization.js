@@ -44,8 +44,8 @@ let liteNetworkBytes = 0
 
 sampleShows.forEach((show) => {
   const url = getOptimizedImageUrl(show.image, 'medium', show.name)
-  // If URL starts with data:image/svg, it is in-memory and triggers 0 network requests
-  if (!url.startsWith('data:')) {
+  // If URL is static play button SVG asset, it triggers 0 external network requests
+  if (url && url.startsWith('https://static.tvmaze.com')) {
     liteNetworkRequests++
     liteNetworkBytes += AVG_MEDIUM_IMAGE_BYTES
   }
@@ -53,7 +53,7 @@ sampleShows.forEach((show) => {
 
 for (let j = 0; j < 5; j++) {
   const url = getOptimizedImageUrl(sampleShows[j].image, 'original', sampleShows[j].name)
-  if (!url.startsWith('data:')) {
+  if (url && url.startsWith('https://static.tvmaze.com')) {
     liteNetworkRequests++
     liteNetworkBytes += AVG_ORIGINAL_BACKDROP_BYTES
   }

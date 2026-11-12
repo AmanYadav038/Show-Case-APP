@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useDataSaver } from '../../composables/useDataSaver.js'
 import { useI18n } from '../../composables/useI18n.js'
+import { useDataSaver } from '../../composables/useDataSaver.js'
 import { stripHtml, formatRating, formatRuntime } from '../../utils/formatters.js'
 import RatingBadge from '../common/RatingBadge.vue'
 
@@ -12,8 +12,8 @@ const props = defineProps({
   }
 })
 
-const { isDataSaverActive } = useDataSaver()
 const { t } = useI18n()
+const { effectiveDataSaverActive, getOptimizedImageUrl } = useDataSaver()
 
 // Group episodes by season
 const seasonsMap = computed(() => {
@@ -84,8 +84,8 @@ const currentSeasonEpisodes = computed(() => {
         <!-- Ep Thumbnail -->
         <div class="ep-thumb-wrapper">
           <img
-            v-if="!isDataSaverActive && ep.image?.medium"
-            :src="ep.image.medium"
+            v-if="effectiveDataSaverActive || ep.image?.medium"
+            :src="getOptimizedImageUrl(ep.image, 'medium', ep.name)"
             :alt="ep.name"
             class="ep-thumb-img"
             loading="lazy"
@@ -235,6 +235,13 @@ const currentSeasonEpisodes = computed(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.ep-thumb-img[src*="play"],
+.ep-thumb-img[src*="placeholder"] {
+  object-fit: contain;
+  padding: 1rem;
+  background: #241c1d;
 }
 
 .ep-thumb-fallback {

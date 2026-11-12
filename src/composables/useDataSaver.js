@@ -1,15 +1,26 @@
 import { ref } from 'vue'
 import { getImageUrl } from '../utils/formatters.js'
+import playButtonSvg from '@/assets/icons/play-button.svg'
 
-// Global shared state for low-bandwidth / data saver mode
+// Export static play button icon asset
+export { playButtonSvg }
+
+// Global user-selected preference (toggled by the floating action button)
 const isDataSaverActive = ref(false)
+
+// Effective resolution mode applied to the current route/view.
+// Clicking the floating action button does NOT change images on the current screen instantly,
+// but reduces the resolution on further page redirections/navigations!
+const effectiveDataSaverActive = ref(false)
 
 // Hydrate from localStorage if in browser environment
 if (typeof window !== 'undefined' && window.localStorage) {
   try {
     const stored = localStorage.getItem('showcase_data_saver')
     if (stored !== null) {
-      isDataSaverActive.value = stored === 'true'
+      const isEnabled = stored === 'true'
+      isDataSaverActive.value = isEnabled
+      effectiveDataSaverActive.value = isEnabled
     }
   } catch (e) {
     // Graceful fallback if localStorage is restricted
@@ -17,45 +28,20 @@ if (typeof window !== 'undefined' && window.localStorage) {
 }
 
 /**
- * Generate a lightweight SVG vector placeholder to replace images in low-bandwidth mode.
- * Generates zero external network requests and renders instantly.
- *
- * @param {string} title - Show title
- * @param {'medium'|'original'} size - Poster vs Backdrop
- * @returns {string} SVG Data URI
+ * Synchronize the effective resolution state upon route navigation / redirection.
  */
-export function generatePlaceholderSvg(title = '', size = 'medium') {
-  const isBackdrop = size === 'original'
-  const width = isBackdrop ? 960 : 300
-  const height = isBackdrop ? 540 : 450
-  const cleanTitle = (title || 'ShowCase TV')
-    .replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]))
+export function syncDataSaverOnNavigation() {
+  effectiveDataSaverActive.value = isDataSaverActive.value
+}
 
-  const titleSnippet = cleanTitle.length > 20 ? cleanTitle.slice(0, 18) + '…' : cleanTitle
-
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
-  <defs>
-    <linearGradient id="g_${isBackdrop ? 'b' : 'p'}" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1a1414"/>
-      <stop offset="50%" stop-color="#2b1f1f"/>
-      <stop offset="100%" stop-color="#141111"/>
-    </linearGradient>
-  </defs>
-  <rect width="${width}" height="${height}" fill="url(#g_${isBackdrop ? 'b' : 'p'})"/>
-  <rect x="${width * 0.08}" y="${height * 0.08}" width="${width * 0.84}" height="${height * 0.84}" rx="10" fill="none" stroke="#4a3737" stroke-width="1.5" stroke-dasharray="6,6"/>
-  <g transform="translate(${width / 2}, ${height * 0.42})">
-    <circle r="${isBackdrop ? 36 : 26}" fill="#241919" stroke="#e63946" stroke-width="2"/>
-    <path d="M-8 -10 L10 0 L-8 10 Z" fill="#e63946"/>
-  </g>
-  <text x="${width / 2}" y="${height * 0.65}" font-family="system-ui, -apple-system, sans-serif" font-size="${isBackdrop ? 24 : 15}" font-weight="700" fill="#f8fafc" text-anchor="middle">
-    ${titleSnippet}
-  </text>
-  <text x="${width / 2}" y="${height * 0.76}" font-family="system-ui, -apple-system, sans-serif" font-size="${isBackdrop ? 15 : 10}" font-weight="700" fill="#e63946" text-anchor="middle" letter-spacing="1">
-    ⚡ LOW-RES PLACEHOLDER
-  </text>
-</svg>`
-
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
+/**
+ * Returns the playbutton SVG asset as src for placeholders and low-res mode.
+ * No inline SVG code is generated.
+ *
+ * @returns {string} Play button SVG asset URL
+ */
+export function generatePlaceholderSvg() {
+  return playButtonSvg
 }
 
 export function useDataSaver() {
@@ -71,8 +57,11 @@ export function useDataSaver() {
     return isDataSaverActive.value
   }
 
-  function setDataSaver(enabled) {
+  function setDataSaver(enabled, immediate = true) {
     isDataSaverActive.value = Boolean(enabled)
+    if (immediate) {
+      effectiveDataSaverActive.value = Boolean(enabled)
+    }
     if (typeof window !== 'undefined' && window.localStorage) {
       try {
         localStorage.setItem('showcase_data_saver', String(isDataSaverActive.value))
@@ -83,21 +72,32 @@ export function useDataSaver() {
   }
 
   /**
-   * Get image URL with automatic fallback to lightweight vector placeholder
-   * when data saver / low-res mode is active.
+   * Resolves the image URL:
+   * - In low-res mode: Uses the playbutton SVG as src like the rest of the icons in the project,
+   *   eliminating network image downloads on redirection while keeping existing images intact before navigation.
+   * - In HD mode: Returns the requested TVMaze API size ('original' for backdrops, 'medium' for cards),
+   *   falling back to playbutton SVG if the show has no image.
    */
   function getOptimizedImageUrl(image, size = 'medium', fallbackTitle = '') {
-    if (isDataSaverActive.value) {
-      return generatePlaceholderSvg(fallbackTitle, size)
+    if (effectiveDataSaverActive.value) {
+      return playButtonSvg
     }
-    return getImageUrl(image, size)
+
+    if (!image) {
+      return playButtonSvg
+    }
+
+    return getImageUrl(image, size) || playButtonSvg
   }
 
   return {
     isDataSaverActive,
+    effectiveDataSaverActive,
     toggleDataSaver,
     setDataSaver,
+    syncDataSaverOnNavigation,
     getOptimizedImageUrl,
-    generatePlaceholderSvg
+    generatePlaceholderSvg,
+    playButtonSvg
   }
 }

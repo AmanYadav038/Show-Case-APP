@@ -212,6 +212,13 @@ onUnmounted(() => {
   filter: brightness(0.75);
 }
 
+.hero-backdrop-img[src*="play"],
+.hero-backdrop-img[src*="placeholder"] {
+  object-fit: contain;
+  padding: 4rem;
+  background: radial-gradient(circle at center, #2e1d20 0%, #141011 80%);
+}
+
 .hero-vignette-overlay {
   position: absolute;
   inset: 0;

@@ -175,6 +175,13 @@ function handleWatchlistClick(e) {
   transition: transform var(--transition-bounce);
 }
 
+.poster-img[src*="play"],
+.poster-img[src*="placeholder"] {
+  object-fit: contain;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #241c1d 0%, #171213 100%);
+}
+
 .show-card:hover .poster-img {
   transform: scale(1.05);
 }

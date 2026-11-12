@@ -348,6 +348,13 @@ watch(() => props.id, () => {
   transform: scale(1.05);
 }
 
+.backdrop-img[src*="play"],
+.backdrop-img[src*="placeholder"] {
+  object-fit: contain;
+  padding: 4rem;
+  background: radial-gradient(circle at center, #2e1d20 0%, #141011 80%);
+}
+
 .backdrop-gradient-left {
   position: absolute;
   inset: 0;
@@ -436,6 +443,13 @@ watch(() => props.id, () => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.detail-poster-img[src*="play"],
+.detail-poster-img[src*="placeholder"] {
+  object-fit: contain;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #241c1d 0%, #171213 100%);
 }
 
 .detail-poster-fallback {

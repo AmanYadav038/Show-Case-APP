@@ -12,9 +12,9 @@ function handleClick() {
   if (toastTimer) clearTimeout(toastTimer)
 
   if (isNowActive) {
-    toastMessage.value = '⚡ Low-Res Mode ON: Show images replaced with lightweight placeholders'
+    toastMessage.value = '⚡ Low-Res Mode ON: Resolution will be reduced on further page redirections'
   } else {
-    toastMessage.value = '🖼️ High-Res Mode ON: Original show images restored'
+    toastMessage.value = '🖼️ High-Res Mode ON: High resolution will be restored on further page redirections'
   }
 
   toastTimer = setTimeout(() => {
@@ -37,8 +37,8 @@ function handleClick() {
     <button
       class="data-saver-fab"
       :class="{ 'fab-active': isDataSaverActive }"
-      :title="isDataSaverActive ? 'Disable Data Saver (Load full images)' : 'Enable Data Saver (Use low-res placeholders)'"
-      :aria-label="isDataSaverActive ? 'Data saver active. Click to load high-res images.' : 'Data saver inactive. Click to use low-res placeholders.'"
+      :title="isDataSaverActive ? 'Disable Low-Res Mode (Restores HD on next page)' : 'Enable Low-Res Mode (Reduces resolution on next page)'"
+      :aria-label="isDataSaverActive ? 'Low-res mode active. Click to restore HD on next page.' : 'HD mode active. Click to reduce resolution on next page.'"
       :aria-pressed="isDataSaverActive"
       @click="handleClick"
     >
@@ -77,7 +77,7 @@ function handleClick() {
       </div>
 
       <span class="fab-tooltip">
-        {{ isDataSaverActive ? 'Turn off low-res mode' : 'Replace images with placeholders' }}
+        {{ isDataSaverActive ? 'Restore HD on next page' : 'Reduce resolution on next page' }}
       </span>
     </button>
   </div>

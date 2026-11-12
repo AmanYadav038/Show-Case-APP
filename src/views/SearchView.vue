@@ -765,6 +765,13 @@ watch(() => [route.query.q, route.query.type, route.query.personId], ([newQ, new
   object-fit: cover;
 }
 
+.actor-avatar-img[src*="play"],
+.actor-avatar-img[src*="placeholder"] {
+  object-fit: contain;
+  padding: 1rem;
+  background: #241c1d;
+}
+
 .actor-avatar-fallback {
   width: 100%;
   height: 100%;

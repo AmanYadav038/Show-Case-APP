@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { syncDataSaverOnNavigation } from '../composables/useDataSaver.js'
 import DashboardView from '../views/DashboardView.vue'
 import ShowDetailView from '../views/ShowDetailView.vue'
 import SearchView from '../views/SearchView.vue'
@@ -56,6 +57,7 @@ const router = createRouter({
 })
 
 router.afterEach((to) => {
+  syncDataSaverOnNavigation()
   if (to.meta?.title) {
     document.title = to.meta.title
   }
