@@ -5,7 +5,7 @@ import { useHoverPreview } from '../../composables/useHoverPreview.js'
 import { useWatchlist } from '../../composables/useWatchlist.js'
 import { useDataSaver } from '../../composables/useDataSaver.js'
 import { useI18n } from '../../composables/useI18n.js'
-import { stripHtml, formatYearRange, formatRuntime, getImageUrl } from '../../utils/formatters.js'
+import { stripHtml, formatYearRange, formatRuntime } from '../../utils/formatters.js'
 import RatingBadge from '../common/RatingBadge.vue'
 
 const router = useRouter()

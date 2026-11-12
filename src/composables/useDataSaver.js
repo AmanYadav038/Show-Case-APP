@@ -44,16 +44,20 @@ export function generatePlaceholderSvg() {
   return playButtonSvg
 }
 
+function persistToStorage(val) {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      localStorage.setItem('showcase_data_saver', String(val))
+    } catch (e) {
+      // Ignore localStorage error
+    }
+  }
+}
+
 export function useDataSaver() {
   function toggleDataSaver() {
     isDataSaverActive.value = !isDataSaverActive.value
-    if (typeof window !== 'undefined' && window.localStorage) {
-      try {
-        localStorage.setItem('showcase_data_saver', String(isDataSaverActive.value))
-      } catch (e) {
-        // Ignore localStorage error
-      }
-    }
+    persistToStorage(isDataSaverActive.value)
     return isDataSaverActive.value
   }
 
@@ -62,13 +66,7 @@ export function useDataSaver() {
     if (immediate) {
       effectiveDataSaverActive.value = Boolean(enabled)
     }
-    if (typeof window !== 'undefined' && window.localStorage) {
-      try {
-        localStorage.setItem('showcase_data_saver', String(isDataSaverActive.value))
-      } catch (e) {
-        // Ignore localStorage error
-      }
-    }
+    persistToStorage(isDataSaverActive.value)
   }
 
   /**

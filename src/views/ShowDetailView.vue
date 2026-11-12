@@ -11,8 +11,7 @@ import {
   formatRating,
   formatYearRange,
   formatRuntime,
-  formatSchedule,
-  getImageUrl
+  formatSchedule
 } from '../utils/formatters.js'
 
 import RatingBadge from '../components/common/RatingBadge.vue'
