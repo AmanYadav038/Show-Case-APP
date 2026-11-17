@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useShows, CURATED_GENRES } from '../../src/composables/useShows.js'
+import { useShows, CURATED_GENRES, ALL_TVMAZE_GENRES } from '../../src/composables/useShows.js'
 import * as tvmazeApi from '../../src/services/tvmazeApi.js'
 
 describe('useShows composable', () => {
@@ -44,6 +44,14 @@ describe('useShows composable', () => {
     expect(CURATED_GENRES).toContain('Drama')
     expect(CURATED_GENRES).toContain('Action')
     expect(CURATED_GENRES).toContain('Comedy')
+  })
+
+  it('ALL_TVMAZE_GENRES exports all 28 genres including Western, Fantasy, War', () => {
+    expect(ALL_TVMAZE_GENRES.length).toBe(28)
+    expect(ALL_TVMAZE_GENRES).toContain('Western')
+    expect(ALL_TVMAZE_GENRES).toContain('Fantasy')
+    expect(ALL_TVMAZE_GENRES).toContain('War')
+    expect(ALL_TVMAZE_GENRES).toContain('History')
   })
 
   it('loadShows fetches data from tvmazeApi and updates reactive state', async () => {

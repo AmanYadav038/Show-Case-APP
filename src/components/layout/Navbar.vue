@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWatchlist } from '../../composables/useWatchlist.js'
 import { useI18n } from '../../composables/useI18n.js'
-import { CURATED_GENRES } from '../../composables/useShows.js'
+import { ALL_TVMAZE_GENRES } from '../../composables/useShows.js'
 import SearchBar from '../search/SearchBar.vue'
 
 const router = useRouter()
@@ -14,7 +14,7 @@ const isMobileMenuOpen = ref(false)
 const isGenreDropdownOpen = ref(false)
 const genreDropdownRef = ref(null)
 
-const allNavGenres = ['Top-Rated', ...CURATED_GENRES]
+const allNavGenres = ['Top-Rated', ...ALL_TVMAZE_GENRES]
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -321,6 +321,8 @@ onUnmounted(() => {
   top: calc(100% + 12px);
   left: 0;
   width: 360px;
+  max-height: 420px;
+  overflow-y: auto;
   background: var(--bg-surface);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);

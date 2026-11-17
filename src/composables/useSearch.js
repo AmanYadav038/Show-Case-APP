@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { searchShows, searchPeople } from '../services/tvmazeApi.js'
-import { CURATED_GENRES } from './useShows.js'
+import { ALL_TVMAZE_GENRES, useShows } from './useShows.js'
 
 export function useSearch() {
   const query = ref('')
@@ -32,17 +32,34 @@ export function useSearch() {
         }))
       } else if (scope === 'genres') {
         const lower = trimmed.toLowerCase()
-        const matchedGenres = CURATED_GENRES.filter(g => g.toLowerCase().includes(lower))
-        const shows = await searchShows(trimmed)
-        const genreShows = shows.filter(s => Array.isArray(s.genres) && s.genres.some(g => g.toLowerCase().includes(lower)))
+        const matchedGenres = ALL_TVMAZE_GENRES.filter(g => g.toLowerCase().includes(lower))
+
+        // Query in-memory catalog for any shows tagged with this genre
+        const { shows: inMemoryShows } = useShows()
+        const catalogGenreShows = (inMemoryShows.value || []).filter(s =>
+          Array.isArray(s.genres) && s.genres.some(g => g.toLowerCase().includes(lower))
+        )
+
+        const apiShows = await searchShows(trimmed)
+        const apiGenreShows = apiShows.filter(s =>
+          Array.isArray(s.genres) && s.genres.some(g => g.toLowerCase().includes(lower))
+        )
+
+        // Merge deduplicated genre shows
+        const mergedMap = new Map()
+        catalogGenreShows.forEach(s => mergedMap.set(s.id, s))
+        apiGenreShows.forEach(s => mergedMap.set(s.id, s))
+        if (mergedMap.size === 0) {
+          apiShows.forEach(s => mergedMap.set(s.id, s))
+        }
 
         const genreItems = matchedGenres.map(g => ({
           id: `genre-${g}`,
-          name: `${g} Shows`,
+          name: `Explore all ${g} TV Shows`,
           genreName: g,
           resultType: 'genre'
         }))
-        data = [...genreItems, ...genreShows]
+        data = [...genreItems, ...Array.from(mergedMap.values())]
       } else if (scope === 'shows') {
         data = await searchShows(trimmed)
       } else {
@@ -60,7 +77,19 @@ export function useSearch() {
         }
 
         const lower = trimmed.toLowerCase()
-        const matchedGenre = CURATED_GENRES.find(g => g.toLowerCase() === lower || g.toLowerCase().startsWith(lower))
+        const matchedGenre = ALL_TVMAZE_GENRES.find(g =>
+          g.toLowerCase() === lower || g.toLowerCase().startsWith(lower) || g.toLowerCase().includes(lower)
+        )
+
+        // If a genre matches, also fetch matching shows from in-memory catalog
+        let catalogGenreShows = []
+        if (matchedGenre) {
+          const { shows: inMemoryShows } = useShows()
+          catalogGenreShows = (inMemoryShows.value || []).filter(s =>
+            Array.isArray(s.genres) && s.genres.some(g => g.toLowerCase() === matchedGenre.toLowerCase())
+          ).slice(0, 4)
+        }
+
         const genreItems = matchedGenre ? [{
           id: `genre-${matchedGenre}`,
           name: `Explore all ${matchedGenre} TV Shows`,
@@ -68,7 +97,11 @@ export function useSearch() {
           resultType: 'genre'
         }] : []
 
-        data = [...genreItems, ...people, ...shows]
+        const mergedMap = new Map()
+        catalogGenreShows.forEach(s => mergedMap.set(s.id, s))
+        shows.forEach(s => mergedMap.set(s.id, s))
+
+        data = [...genreItems, ...people, ...Array.from(mergedMap.values())]
       }
 
       results.value = data

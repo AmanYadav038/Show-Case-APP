@@ -136,6 +136,21 @@ describe('SearchView.vue', () => {
     expect(wrapper.find('.actor-spotlight-card').exists()).toBe(false)
   })
 
+  it('identifies non-curated TVMaze genres like Western and displays genre spotlight card', async () => {
+    mockRoute.query = { q: 'Western', type: 'genres' }
+    const mockWesternShows = [
+      { id: 179, name: 'Deadwood', genres: ['Western', 'Drama'], rating: { average: 8.8 } }
+    ]
+    vi.spyOn(tvmazeApi, 'searchShows').mockResolvedValueOnce(mockWesternShows)
+
+    const wrapper = mountSearchView()
+    await flushPromises()
+
+    expect(wrapper.find('.genre-spotlight-card').exists()).toBe(true)
+    expect(wrapper.find('.genre-spotlight-title').text()).toContain('Western')
+    expect(wrapper.text()).toContain('Deadwood')
+  })
+
   it('displays empty state when actor has no shows and query matches nothing', async () => {
     mockRoute.query = { q: 'UnknownActorXYZ' }
     vi.spyOn(tvmazeApi, 'searchShows').mockResolvedValueOnce([])

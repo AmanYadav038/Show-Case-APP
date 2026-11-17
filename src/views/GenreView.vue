@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useShows, CURATED_GENRES } from '../composables/useShows.js'
+import { useShows, ALL_TVMAZE_GENRES } from '../composables/useShows.js'
 import { useI18n } from '../composables/useI18n.js'
 import ShowCard from '../components/shows/ShowCard.vue'
 import LoadingSkeleton from '../components/common/LoadingSkeleton.vue'
@@ -32,12 +32,61 @@ const { t, translateGenre } = useI18n()
 const currentGenre = ref(props.genre || 'Drama')
 const sortBy = ref('rating') // 'rating' | 'popularity' | 'year' | 'name'
 
+// Shows currently displayed in the active genre grid
+const displayedShows = ref([])
+
 // Extra shows loaded on-demand specifically for the active genre view (not cached globally)
 const extraShows = ref([])
 const currentGenrePage = ref(0)
 const hasMoreGenre = ref(true)
 const loadMoreMessage = ref('')
 let feedbackTimer = null
+
+// Helper to sort a show list by criteria
+function sortShowList(list, criteria = sortBy.value) {
+  return [...list].sort((a, b) => {
+    if (criteria === 'rating') {
+      const rA = a.rating?.average ?? 0
+      const rB = b.rating?.average ?? 0
+      if (rB !== rA) return rB - rA
+      return (b.weight ?? 0) - (a.weight ?? 0)
+    }
+    if (criteria === 'popularity') {
+      return (b.weight ?? 0) - (a.weight ?? 0)
+    }
+    if (criteria === 'year') {
+      const yA = a.premiered ? parseInt(a.premiered) : 0
+      const yB = b.premiered ? parseInt(b.premiered) : 0
+      return yB - yA
+    }
+    if (criteria === 'name') {
+      return a.name.localeCompare(b.name)
+    }
+    return 0
+  })
+}
+
+// Extract base Page 0 shows for the active genre
+function getBaseGenreShows() {
+  const g = currentGenre.value.toLowerCase()
+  if (g === 'top-rated') {
+    return shows.value.filter(s => s.rating?.average >= 7.8)
+  }
+  return shows.value.filter(s => 
+    Array.isArray(s.genres) && s.genres.some(item => item.toLowerCase() === g)
+  )
+}
+
+// Initialize or reset displayed shows for active genre
+function initGenreShows() {
+  const base = getBaseGenreShows()
+  displayedShows.value = sortShowList(base, sortBy.value)
+}
+
+// When user explicitly changes the sortBy dropdown, re-sort all currently displayed shows
+watch(sortBy, (newCriteria) => {
+  displayedShows.value = sortShowList(displayedShows.value, newCriteria)
+})
 
 // Reset genre-specific extra shows and pagination when switching genre
 function resetGenreExtra() {
@@ -52,7 +101,7 @@ async function handleLoadMore() {
   if (isLoadingMore.value || !hasMoreGenre.value) return
   if (feedbackTimer) clearTimeout(feedbackTimer)
 
-  const existingIds = new Set(genreShows.value.map(s => s.id))
+  const existingIds = new Set(displayedShows.value.map(s => s.id))
   const nextPageToFetch = currentGenrePage.value + 1
 
   const { newShows, lastPage, hasMore } = await loadMoreShowsForGenre(
@@ -65,9 +114,18 @@ async function handleLoadMore() {
   hasMoreGenre.value = hasMore
 
   if (newShows && newShows.length > 0) {
-    extraShows.value = [...extraShows.value, ...newShows]
+    // Deduplicate against already visible shows
+    const uniqueNew = newShows.filter(s => !existingIds.has(s.id))
+    // Sort only this incoming batch so items within the batch are ordered
+    const sortedNewBatch = sortShowList(uniqueNew, sortBy.value)
+
+    // APPEND TO THE BOTTOM:
+    // Existing shows stay in place with zero shuffling or layout jumps!
+    displayedShows.value = [...displayedShows.value, ...sortedNewBatch]
+    extraShows.value = [...extraShows.value, ...sortedNewBatch]
+
     loadMoreMessage.value = t('genreView.loadedMoreToast', {
-      count: newShows.length,
+      count: sortedNewBatch.length,
       genre: translateGenre(currentGenre.value)
     })
     feedbackTimer = setTimeout(() => {
@@ -87,7 +145,7 @@ async function handleLoadMore() {
 
 // All available genre choices including 'Top-Rated'
 const allGenres = computed(() => {
-  return ['Top-Rated', ...CURATED_GENRES]
+  return ['Top-Rated', ...ALL_TVMAZE_GENRES]
 })
 
 // Normalize genre name for display and filtering
@@ -105,69 +163,46 @@ const genreDescription = computed(() => {
   return t('genreView.desc', { genre: translateGenre(currentGenre.value) })
 })
 
-const genreShows = computed(() => {
-  if (!shows.value.length && !extraShows.value.length) return []
-
-  const g = currentGenre.value.toLowerCase()
-  let list = []
-
-  // 1. Base shows strictly from Page 0 (cached in shows.value)
-  if (g === 'top-rated') {
-    list = shows.value.filter(s => s.rating?.average >= 7.8)
-  } else {
-    list = shows.value.filter(s => 
-      Array.isArray(s.genres) && s.genres.some(item => item.toLowerCase() === g)
-    )
-  }
-
-  // 2. Combine with extra shows loaded specifically for THIS genre view
-  if (extraShows.value.length > 0) {
-    const existingIds = new Set(list.map(s => s.id))
-    const uniqueExtras = extraShows.value.filter(s => !existingIds.has(s.id))
-    list = [...list, ...uniqueExtras]
-  }
-
-  // 3. Sort
-  return [...list].sort((a, b) => {
-    if (sortBy.value === 'rating') {
-      const rA = a.rating?.average ?? 0
-      const rB = b.rating?.average ?? 0
-      if (rB !== rA) return rB - rA
-      return (b.weight ?? 0) - (a.weight ?? 0)
-    }
-    if (sortBy.value === 'popularity') {
-      return (b.weight ?? 0) - (a.weight ?? 0)
-    }
-    if (sortBy.value === 'year') {
-      const yA = a.premiered ? parseInt(a.premiered) : 0
-      const yB = b.premiered ? parseInt(b.premiered) : 0
-      return yB - yA
-    }
-    if (sortBy.value === 'name') {
-      return a.name.localeCompare(b.name)
-    }
-    return 0
-  })
-})
+// Primary computed list consumed by the template
+const genreShows = computed(() => displayedShows.value)
 
 function changeGenre(newGenre) {
   currentGenre.value = newGenre
   resetGenreExtra()
+  initGenreShows()
   router.push({ name: 'genre-detail', params: { genre: newGenre } })
+  autoProbeIfEmpty()
 }
 
-onMounted(() => {
-  loadShows()
+async function autoProbeIfEmpty() {
+  if (displayedShows.value.length === 0 && hasMoreGenre.value && !isLoadingMore.value) {
+    await handleLoadMore()
+  }
+}
+
+onMounted(async () => {
+  await loadShows()
   if (props.genre) {
     currentGenre.value = props.genre
   }
+  initGenreShows()
+  autoProbeIfEmpty()
 })
 
-watch(() => props.genre, (newVal) => {
+watch(shows, () => {
+  if (displayedShows.value.length === 0) {
+    initGenreShows()
+    autoProbeIfEmpty()
+  }
+})
+
+watch(() => props.genre, async (newVal) => {
   if (newVal) {
     currentGenre.value = newVal
     resetGenreExtra()
+    initGenreShows()
     window.scrollTo({ top: 0, behavior: 'smooth' })
+    autoProbeIfEmpty()
   }
 })
 </script>

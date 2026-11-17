@@ -88,4 +88,11 @@ describe('useSearch composable', () => {
     expect(data.some(item => item.name === 'Breaking Bad')).toBe(true)
     expect(results.value).toEqual(data)
   })
+
+  it('executeSearch with scope genres identifies TVMaze genres and returns genre explore card', async () => {
+    vi.spyOn(tvmazeApi, 'searchShows').mockResolvedValueOnce([])
+    const { executeSearch, results } = useSearch()
+    const data = await executeSearch('Western', 'genres')
+    expect(data.some(item => item.resultType === 'genre' && item.genreName === 'Western')).toBe(true)
+  })
 })

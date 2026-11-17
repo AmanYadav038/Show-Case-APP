@@ -1,7 +1,41 @@
 import { ref, computed } from 'vue'
 import { fetchShows } from '../services/tvmazeApi.js'
 
-// Standard genres we want to present
+// Complete registry of all 28 genres recognized across the TVMaze database
+export const ALL_TVMAZE_GENRES = [
+  'Action',
+  'Adult',
+  'Adventure',
+  'Anime',
+  'Children',
+  'Comedy',
+  'Crime',
+  'DIY',
+  'Drama',
+  'Espionage',
+  'Family',
+  'Fantasy',
+  'Food',
+  'History',
+  'Horror',
+  'Legal',
+  'Medical',
+  'Music',
+  'Mystery',
+  'Nature',
+  'Romance',
+  'Science-Fiction',
+  'Sports',
+  'Supernatural',
+  'Thriller',
+  'Travel',
+  'War',
+  'Western'
+]
+
+export const ALL_GENRES = ALL_TVMAZE_GENRES
+
+// Curated primary genres showcased as horizontal carousels on the Home page
 export const CURATED_GENRES = [
   'Drama',
   'Action',

@@ -89,6 +89,9 @@ describe('useI18n composable', () => {
     expect(i18n.translateGenre('Crime')).toBe('क्राइम')
     expect(i18n.translateGenre('Anime')).toBe('एनिमे')
     expect(i18n.translateGenre('Adventure')).toBe('एडवेंचर')
+    expect(i18n.translateGenre('Fantasy')).toBe('फैंटेसी')
+    expect(i18n.translateGenre('Western')).toBe('वेस्टर्न')
+    expect(i18n.translateGenre('War')).toBe('युद्ध')
   })
 
   it('gracefully handles unknown genres by returning original value', () => {

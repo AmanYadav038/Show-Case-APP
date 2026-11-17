@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { searchShows, searchPeople, fetchPersonCastCredits } from '../services/tvmazeApi.js'
-import { CURATED_GENRES } from '../composables/useShows.js'
+import { ALL_TVMAZE_GENRES, useShows } from '../composables/useShows.js'
 import { useI18n } from '../composables/useI18n.js'
 import { useDataSaver } from '../composables/useDataSaver.js'
 import ShowCard from '../components/shows/ShowCard.vue'
@@ -89,18 +89,30 @@ async function performSearch(q, type = searchType.value, personId = route.query.
       // 3. Explicitly searching for GENRES (actor spotlight hidden)
       actorResult.value = null
       const lower = trimmed.toLowerCase()
-      const matchedGenre = CURATED_GENRES.find(g => g.toLowerCase().includes(lower))
+      const matchedGenre = ALL_TVMAZE_GENRES.find(g => g.toLowerCase().includes(lower))
       if (matchedGenre) {
         matchedGenreResult.value = matchedGenre
       }
 
+      const { shows: inMemoryShows } = useShows()
+      const catalogGenreShows = (inMemoryShows.value || []).filter(s =>
+        Array.isArray(s.genres) && s.genres.some(g => g.toLowerCase().includes(lower))
+      )
+
       const shows = await searchShows(trimmed)
       const genreShows = shows.filter(s => Array.isArray(s.genres) && s.genres.some(g => g.toLowerCase().includes(lower)))
-      rawResults.value = genreShows.length > 0 ? genreShows : shows
+
+      const mergedMap = new Map()
+      catalogGenreShows.forEach(s => mergedMap.set(s.id, s))
+      genreShows.forEach(s => mergedMap.set(s.id, s))
+      if (mergedMap.size === 0) {
+        shows.forEach(s => mergedMap.set(s.id, s))
+      }
+      rawResults.value = Array.from(mergedMap.values())
     } else {
       // 4. 'all' - Unified search
       const lower = trimmed.toLowerCase()
-      const matchedGenre = CURATED_GENRES.find(g => g.toLowerCase().includes(lower))
+      const matchedGenre = ALL_TVMAZE_GENRES.find(g => g.toLowerCase().includes(lower))
       if (matchedGenre) {
         matchedGenreResult.value = matchedGenre
       }
