@@ -92,3 +92,5 @@ Generates an optimized, minified production bundle in the `dist/` directory.
 ```bash
 npm run preview
 ```
+
+Deployed on url: https://vultureshowcase.netlify.app/
